@@ -27,7 +27,8 @@
 \widowctrl\hyphauto
 
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 LaoK Clipboard \u29992 ?\u25143 ?\u25805 ?\u20316 ?\u25163 ?\u20876 ?\u65288 ?V0.1\u65289 ?\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \u31616 ?\u21333 ?\u22909 ?\u29992 ?\u30340 ?Reaper\u22840 ?\u24037 ?\u31243 ?\u25628 ?\u32034 ?\u19982 ?\u24120 ?\u39547 ?\u22797 ?\u21046 ?\u31896 ?\u36148 ?\u24037 ?\u20855 ?\u65281 ?\u65281 ?\u65281 ? \u26412 ?\u25163 ?\u20876 ?\u38754 ?\u21521 ?\u39318 ?\u27425 ?\u20351 ?\u29992 ?\u21644 ?\u26085 ?\u24120 ?\u20351 ?\u29992 ?\u20004 ?\u31867 ?\u22330 ?\u26223 ?\u65292 ?\u21253 ?\u21547 ?\u23436 ?\u25972 ?\u30340 ?\u23433 ?\u35013 ?\u12289 ?\u35774 ?\u32622 ?\u19982 ?\u25805 ?\u20316 ?\u27969 ?\u31243 ?\u12290 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u31616 ?\u21333 ?\u22909 ?\u29992 ?\u30340 ?Reaper\u22840 ?\u24037 ?\u31243 ?\u25628 ?\u32034 ?\u19982 ?\u24120 ?\u39547 ?\u22797 ?\u21046 ?\u31896 ?\u36148 ?\u24037 ?\u20855 ?\u65281 ?\u65281 ?\u65281 ? \u20351 ?\u29992 ?\u35828 ?\u26126 ?\u65306 ?\u30452 ?\u25509 ?\u22312 ?Reapack\u35746 ?\u38405 ?https://raw.githubusercontent.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/master/index.xml \u20043 ?\u21518 ?\u23433 ?\u35013 ?LaoK_Clipboard\u21363 ?\u21487 ? \u35831 ?\u21153 ?\u24517 ?\u25353 ?\u29031 ?\u21021 ?\u27425 ?\u20351 ?\u29992 ?\u25945 ?\u31243 ?\u35774 ?\u32622 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u26412 ?\u25163 ?\u20876 ?\u38754 ?\u21521 ?\u39318 ?\u27425 ?\u20351 ?\u29992 ?\u21644 ?\u26085 ?\u24120 ?\u20351 ?\u29992 ?\u20004 ?\u31867 ?\u22330 ?\u26223 ?\u65292 ?\u21253 ?\u21547 ?\u23436 ?\u25972 ?\u30340 ?\u23433 ?\u35013 ?\u12289 ?\u35774 ?\u32622 ?\u19982 ?\u25805 ?\u20316 ?\u27969 ?\u31243 ?\u12290 ?\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u20381 ?\u36182 ?\u19982 ?\u25991 ?\u20214 ?\u28165 ?\u21333 ?\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u20381 ?\u36182 ?\u65306 ?\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab REAPER 7.x\par}
@@ -40,7 +41,7 @@
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Toolbar_Toggle.lua}\u65288 ?\u24037 ?\u20855 ?\u26639 ?\u20999 ?\u25442 ?\u26174 ?\u31034 ?/\u38544 ?\u34255 ?\u65289 ?\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Shared.lua}\u65288 ?\u20849 ?\u20139 ?\u24211 ?\u65289 ?\sa180\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u21021 ?\u27425 ?\u35774 ?\u32622 ?\u25945 ?\u31243 ?\u65288 ?\u19968 ?\u27493 ?\u19968 ?\u27493 ?\u65289 ?\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 1) \u23548 ?\u20837 ?\u33050 ?\u26412 ?\u21040 ? Action List\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 1) \u23548 ?\u20837 ?\u33050 ?\u26412 ?\u21040 ? Action List\u65288 ?\u35746 ?\u38405 ?Repack\u21487 ?\u24573 ?\u30053 ?\u65289 ?\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u25171 ?\u24320 ? REAPER\u65306 ?{\f1 Actions -> Show action list...}\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u28857 ?\u20987 ? {\f1 ReaScript: Load...}\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u20381 ?\u27425 ?\u36873 ?\u25321 ?\u24182 ?\u21152 ?\u36733 ?\u65288 ?\u20849 ? 5 \u20010 ?\u33050 ?\u26412 ?\u65289 ?\u65306 ?\par}
@@ -49,7 +50,7 @@
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Action_Paste.lua}\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Toolbar_Toggle.lua}\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Shared.lua}\sa180\sa180\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2) \u35774 ?\u32622 ? Main \u20026 ?\u20840 ?\u23616 ?\u21551 ?\u21160 ?\u65288 ?SWS\u65289 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2) \u35774 ?\u32622 ? Main \u20026 ?\u20840 ?\u23616 ?\u21551 ?\u21160 ?\u65288 ?SWS\u65289 ?\u12304 ?\u24517 ?\u20570 ?\u65281 ?\u12305 ?\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u33756 ?\u21333 ?\u36827 ?\u20837 ?\u65306 ?{\f1 Extensions -> Startup actions -> Set global startup actions...}\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u28857 ?\u20987 ? {\f1 Add}\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u22312 ? Action \u21015 ?\u34920 ?\u20013 ?\u25214 ?\u21040 ? {\f1 Script: LaoK_Clipboard_Main.lua}\u65292 ?\u28155 ?\u21152 ?\u24182 ?\u30830 ?\u35748 ?\par}
@@ -58,9 +59,9 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u21491 ?\u38190 ?\u20027 ?\u24037 ?\u20855 ?\u26639 ?\u31354 ?\u30333 ?\u22788 ? -> {\f1 Customize toolbar...}\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u28857 ?\u20987 ? {\f1 Add}\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u25628 ?\u32034 ?\u24182 ?\u36873 ?\u25321 ? {\f1 Script: LaoK_Clipboard_Toolbar_Toggle.lua}\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab \u36873 ?\u25321 ?\u22270 ?\u26631 ?\u24182 ?\u30830 ?\u35748 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab \u36873 ?\u25321 ?\u19968 ?\u20010 ?\u20320 ?\u21916 ?\u27426 ?\u30340 ?\u22270 ?\u26631 ?\u24182 ?\u30830 ?\u35748 ?\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab \u35813 ?\u25353 ?\u38062 ?\u29992 ?\u20110 ?\u26174 ?\u31034 ?/\u38544 ?\u34255 ?\u20027 ?\u31383 ?\u21475 ?\u65288 ?\u33050 ?\u26412 ?\u24120 ?\u39547 ?\u26102 ?\u20877 ?\u27425 ?\u28857 ?\u20987 ?\u20250 ?\u20999 ?\u25442 ?\u26174 ?\u31034 ?\u65289 ?\sa180\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 4) \u20026 ? Pin / Paste \u35774 ?\u32622 ?\u24555 ?\u25463 ?\u38190 ?\u65288 ?\u25512 ?\u33616 ?\u65289 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 4) \u20026 ? Pin / Paste \u35774 ?\u32622 ?\u24555 ?\u25463 ?\u38190 ?\u65288 ?\u25512 ?\u33616 ?\u65289 ?\u12304 ?\u24378 ?\u28872 ?\u24314 ?\u35758 ?\u32473 ?\u39034 ?\u25163 ?\u24555 ?\u25463 ?\u38190 ?shift+C/V\u24456 ?\u33298 ?\u36866 ?\u65281 ?\u12305 ?\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u25171 ?\u24320 ? Action List\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u25628 ?\u32034 ?\u24182 ?\u36873 ?\u20013 ?\u65306 ?\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Script: LaoK_Clipboard_Action_Pin.lua}\par}
