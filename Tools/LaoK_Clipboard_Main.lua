@@ -4,7 +4,6 @@
 -- @about
 --   LaoK_Clipboard：REAPER 常驻窗口工具（Pin/Paste/Toolbar Toggle 等脚本打包安装）。
 -- @provides
---   [main] Tools/LaoK_Clipboard_Main.lua
 --   [main] Tools/LaoK_Clipboard_Action_Pin.lua
 --   [main] Tools/LaoK_Clipboard_Action_Paste.lua
 --   [main] Tools/LaoK_Clipboard_Toolbar_Toggle.lua
