@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="LaoK Clipboard" commit="f7041c9ec8b60b64c4ee08c838cb5bb5e268b4f9">
-<metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+<index version="1" name="LaoK Clipboard" commit="a9a4991583ef5b073b923011e27210bc872f80a5">
+  <category name="Tools">
+    <reapack name="LaoK_Clipboard_Main.lua" type="script" desc="LaoK Clipboard (Main + Actions)">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 LaoK_Clipboard\u65306 ?REAPER \u24120 ?\u39547 ?\u31383 ?\u21475 ?\u24037 ?\u20855 ?\u65288 ?Pin/Paste/Toolbar Toggle \u31561 ?\u33050 ?\u26412 ?\u25171 ?\u21253 ?\u23433 ?\u35013 ?\u65289 ?\u12290 ?\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.1.0" author="sadnessken" time="2026-01-04T14:17:47Z">
+        <changelog><![CDATA[+ Initial release]]></changelog>
+        <source main="main">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/a9a4991583ef5b073b923011e27210bc872f80a5/Tools/LaoK_Clipboard_Main.lua</source>
+        <source main="main" file="LaoK_Clipboard_Action_Pin.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/a9a4991583ef5b073b923011e27210bc872f80a5/Tools/LaoK_Clipboard_Action_Pin.lua</source>
+        <source main="main" file="LaoK_Clipboard_Action_Paste.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/a9a4991583ef5b073b923011e27210bc872f80a5/Tools/LaoK_Clipboard_Action_Paste.lua</source>
+        <source main="main" file="LaoK_Clipboard_Toolbar_Toggle.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/a9a4991583ef5b073b923011e27210bc872f80a5/Tools/LaoK_Clipboard_Toolbar_Toggle.lua</source>
+        <source file="LaoK_Clipboard_Shared.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/a9a4991583ef5b073b923011e27210bc872f80a5/Tools/LaoK_Clipboard_Shared.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <metadata>
+    <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
@@ -124,4 +146,6 @@
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u23581 ?\u35797 ?\u22686 ?\u22823 ? {\f1 Max results}\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u20943 ?\u23567 ? {\f1 Debounce} \u25110 ?\u31561 ?\u24453 ?\u32034 ?\u24341 ?\u21047 ?\u26032 ?\sa180\sa180\par}
 }
-]]></description></metadata></index>
+]]></description>
+  </metadata>
+</index>
