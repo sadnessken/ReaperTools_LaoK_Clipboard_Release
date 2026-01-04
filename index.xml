@@ -1,3 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="LaoK Clipboard">
-</index>
+<index version="1" name="LaoK Clipboard" commit="f7041c9ec8b60b64c4ee08c838cb5bb5e268b4f9">
+<metadata><description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 LaoK Clipboard \u29992 ?\u25143 ?\u25805 ?\u20316 ?\u25163 ?\u20876 ?\u65288 ?V0.1\u65289 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u31616 ?\u21333 ?\u22909 ?\u29992 ?\u30340 ?Reaper\u22840 ?\u24037 ?\u31243 ?\u25628 ?\u32034 ?\u19982 ?\u24120 ?\u39547 ?\u22797 ?\u21046 ?\u31896 ?\u36148 ?\u24037 ?\u20855 ?\u65281 ?\u65281 ?\u65281 ? \u26412 ?\u25163 ?\u20876 ?\u38754 ?\u21521 ?\u39318 ?\u27425 ?\u20351 ?\u29992 ?\u21644 ?\u26085 ?\u24120 ?\u20351 ?\u29992 ?\u20004 ?\u31867 ?\u22330 ?\u26223 ?\u65292 ?\u21253 ?\u21547 ?\u23436 ?\u25972 ?\u30340 ?\u23433 ?\u35013 ?\u12289 ?\u35774 ?\u32622 ?\u19982 ?\u25805 ?\u20316 ?\u27969 ?\u31243 ?\u12290 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u20381 ?\u36182 ?\u19982 ?\u25991 ?\u20214 ?\u28165 ?\u21333 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u20381 ?\u36182 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab REAPER 7.x\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab SWS Extension\u65288 ?\u29992 ?\u20110 ?\u20840 ?\u23616 ?\u21551 ?\u21160 ?\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab ReaImGui\u65288 ?\u30028 ?\u38754 ?\u25152 ?\u38656 ?\u65289 ?\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u33050 ?\u26412 ?\u28165 ?\u21333 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Main.lua}\u65288 ?\u20027 ?\u30028 ?\u38754 ?\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Action_Pin.lua}\u65288 ?Pin\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Action_Paste.lua}\u65288 ?Paste\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Toolbar_Toggle.lua}\u65288 ?\u24037 ?\u20855 ?\u26639 ?\u20999 ?\u25442 ?\u26174 ?\u31034 ?/\u38544 ?\u34255 ?\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Shared.lua}\u65288 ?\u20849 ?\u20139 ?\u24211 ?\u65289 ?\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u21021 ?\u27425 ?\u35774 ?\u32622 ?\u25945 ?\u31243 ?\u65288 ?\u19968 ?\u27493 ?\u19968 ?\u27493 ?\u65289 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 1) \u23548 ?\u20837 ?\u33050 ?\u26412 ?\u21040 ? Action List\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u25171 ?\u24320 ? REAPER\u65306 ?{\f1 Actions -> Show action list...}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u28857 ?\u20987 ? {\f1 ReaScript: Load...}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u20381 ?\u27425 ?\u36873 ?\u25321 ?\u24182 ?\u21152 ?\u36733 ?\u65288 ?\u20849 ? 5 \u20010 ?\u33050 ?\u26412 ?\u65289 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Main.lua}\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Action_Pin.lua}\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Action_Paste.lua}\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Toolbar_Toggle.lua}\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Shared.lua}\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2) \u35774 ?\u32622 ? Main \u20026 ?\u20840 ?\u23616 ?\u21551 ?\u21160 ?\u65288 ?SWS\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u33756 ?\u21333 ?\u36827 ?\u20837 ?\u65306 ?{\f1 Extensions -> Startup actions -> Set global startup actions...}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u28857 ?\u20987 ? {\f1 Add}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u22312 ? Action \u21015 ?\u34920 ?\u20013 ?\u25214 ?\u21040 ? {\f1 Script: LaoK_Clipboard_Main.lua}\u65292 ?\u28155 ?\u21152 ?\u24182 ?\u30830 ?\u35748 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab \u20197 ?\u21518 ? REAPER \u21551 ?\u21160 ?\u26102 ? Main \u20250 ?\u33258 ?\u21160 ?\u24120 ?\u39547 ?\u36816 ?\u34892 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 3) \u20027 ?\u24037 ?\u20855 ?\u26639 ?\u28155 ?\u21152 ?\u22270 ?\u26631 ?\u65288 ?MainBar\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u21491 ?\u38190 ?\u20027 ?\u24037 ?\u20855 ?\u26639 ?\u31354 ?\u30333 ?\u22788 ? -> {\f1 Customize toolbar...}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u28857 ?\u20987 ? {\f1 Add}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u25628 ?\u32034 ?\u24182 ?\u36873 ?\u25321 ? {\f1 Script: LaoK_Clipboard_Toolbar_Toggle.lua}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab \u36873 ?\u25321 ?\u22270 ?\u26631 ?\u24182 ?\u30830 ?\u35748 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab \u35813 ?\u25353 ?\u38062 ?\u29992 ?\u20110 ?\u26174 ?\u31034 ?/\u38544 ?\u34255 ?\u20027 ?\u31383 ?\u21475 ?\u65288 ?\u33050 ?\u26412 ?\u24120 ?\u39547 ?\u26102 ?\u20877 ?\u27425 ?\u28857 ?\u20987 ?\u20250 ?\u20999 ?\u25442 ?\u26174 ?\u31034 ?\u65289 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 4) \u20026 ? Pin / Paste \u35774 ?\u32622 ?\u24555 ?\u25463 ?\u38190 ?\u65288 ?\u25512 ?\u33616 ?\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u25171 ?\u24320 ? Action List\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u25628 ?\u32034 ?\u24182 ?\u36873 ?\u20013 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Script: LaoK_Clipboard_Action_Pin.lua}\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Script: LaoK_Clipboard_Action_Paste.lua}\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u20998 ?\u21035 ?\u28857 ?\u20987 ? {\f1 Add...} \u35774 ?\u32622 ?\u24555 ?\u25463 ?\u38190 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 5) \u39318 ?\u27425 ?\u36816 ?\u34892 ?\u19982 ?\u29992 ?\u25143 ?\u25968 ?\u25454 ?\u21019 ?\u24314 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u23436 ?\u25104 ?\u20197 ?\u19978 ?\u35774 ?\u32622 ?\u21518 ?\u65292 ?\u24314 ?\u35758 ?\u37325 ?\u21551 ? REAPER\u65292 ?\u20197 ?\u35302 ?\u21457 ?\u26631 ?\u20934 ?\u21551 ?\u21160 ?\u27969 ?\u31243 ?\u12290 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u37325 ?\u21551 ?\u21518 ?\u33050 ?\u26412 ?\u20250 ?\u33258 ?\u21160 ?\u24120 ?\u39547 ?\u36816 ?\u34892 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u22914 ?\u26410 ?\u30475 ?\u21040 ?\u31383 ?\u21475 ?\u65292 ?\u28857 ?\u20987 ?\u24037 ?\u20855 ?\u26639 ?\u19978 ?\u30340 ? {\f1 LaoK_Clipboard_Toolbar_Toggle.lua} \u25353 ?\u38062 ?\u26174 ?\u31034 ?\u20027 ?\u30028 ?\u38754 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u33509 ?\u26410 ?\u25214 ?\u21040 ?\u29992 ?\u25143 ?\u25968 ?\u25454 ?\u65292 ?\u20250 ?\u24377 ?\u20986 ? {\f1 User Data Setup} \u31383 ?\u21475 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u28857 ?\u20987 ? {\f1 \u26032 ?\u24314 ?}\u65306 ?\u36873 ?\u25321 ?\u20445 ?\u23384 ?\u20301 ?\u32622 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u25353 ?\u25552 ?\u31034 ?\u21019 ?\u24314 ?\u29992 ?\u25143 ?\u21517 ?\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab \u31995 ?\u32479 ?\u20250 ?\u29983 ?\u25104 ?\u65306 ?{\f1 \u29992 ?\u25143 ?\u21517 ?_ClipUserData.json}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab \u29992 ?\u25143 ?\u25968 ?\u25454 ?\u19982 ?\u26085 ?\u24535 ?\u25991 ?\u20214 ?\u20301 ?\u20110 ?\u21516 ?\u19968 ?\u30446 ?\u24405 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 \u29992 ?\u25143 ?\u21517 ?_ClipUserData.json}\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 userdata.log}\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 6.\tx360\tab \u25152 ?\u26377 ?\u25968 ?\u25454 ?\u33258 ?\u21160 ?\u20445 ?\u23384 ?\u65292 ?\u26080 ?\u38656 ?\u25163 ?\u21160 ?\u20445 ?\u23384 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u26085 ?\u24120 ?\u25805 ?\u20316 ?\u35828 ?\u26126 ?\u65288 ?\u35814 ?\u32454 ?\u65289 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 1) \u31383 ?\u21475 ?\u26174 ?\u31034 ?/\u38544 ?\u34255 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u20027 ?\u31383 ?\u21475 ?\u21491 ?\u19978 ?\u35282 ? {\f1 -} \u20026 ?\u38544 ?\u34255 ?\u25353 ?\u38062 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u20877 ?\u27425 ?\u28857 ?\u20987 ?\u20027 ?\u24037 ?\u20855 ?\u26639 ?\u19978 ?\u30340 ? Main \u22270 ?\u26631 ?\u21487 ?\u37325 ?\u26032 ?\u26174 ?\u31034 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u33050 ?\u26412 ?\u24120 ?\u39547 ?\u36816 ?\u34892 ?\u65292 ?\u19981 ?\u38656 ?\u35201 ?\u25163 ?\u21160 ?\u20851 ?\u38381 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 2) \u26631 ?\u31614 ?\u65288 ?Tag\u65289 ?\u31649 ?\u29702 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u24038 ?\u20391 ?\u26159 ?\u26631 ?\u31614 ?\u21015 ?\u65292 ?\u28857 ?\u20987 ?\u20999 ?\u25442 ?\u24403 ?\u21069 ?\u26631 ?\u31614 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 + Add Tag} \u28155 ?\u21152 ?\u26631 ?\u31614 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u21491 ?\u38190 ?\u26631 ?\u31614 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Rename} \u37325 ?\u21629 ?\u21517 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Delete} \u21024 ?\u38500 ?\u65288 ?\u20854 ?\u19979 ? Pin \u20250 ?\u33258 ?\u21160 ?\u24402 ?\u21040 ? Default\u65289 ?\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 3) Pin \u31649 ?\u29702 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u21491 ?\u20391 ?\u20026 ? Pin \u25353 ?\u38062 ?\u32593 ?\u26684 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u28857 ?\u20987 ? Pin \u21487 ?\u36873 ?\u20013 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u21491 ?\u38190 ? Pin\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Rename} \u37325 ?\u21629 ?\u21517 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Delete} \u21024 ?\u38500 ?\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 4) Pin \u25805 ?\u20316 ?\u65288 ?\u20445 ?\u23384 ?\u65289 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel3 \b \fs24 Pin \u36712 ?\u36947 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u36873 ?\u25321 ?\u38656 ?\u35201 ?\u20445 ?\u23384 ?\u30340 ?\u19968 ?\u32452 ?\u36712 ?\u36947 ?\u65288 ?\u21547 ?\u23376 ?\u36712 ?\u36947 ?\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u36816 ?\u34892 ? {\f1 Pin} \u33050 ?\u26412 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u23558 ?\u20445 ?\u23384 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u36712 ?\u36947 ?\u32467 ?\u26500 ?\u19982 ? FX\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u36712 ?\u36947 ?\u19978 ?\u30340 ? Items\u65288 ?\u21547 ? take_fx / item_fx / \u21253 ?\u32476 ?\u31561 ?\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u23186 ?\u20307 ?\u25991 ?\u20214 ?\u36335 ?\u24452 ?\u65288 ?\u33258 ?\u21160 ?\u32477 ?\u23545 ?\u21270 ?\u65289 ?\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel3 \b \fs24 Pin Items\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u36873 ?\u25321 ?\u38656 ?\u35201 ?\u20445 ?\u23384 ?\u30340 ? Items\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u36816 ?\u34892 ? {\f1 Pin} \u33050 ?\u26412 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Items \u20250 ?\u25353 ?\u30456 ?\u23545 ?\u20559 ?\u31227 ?\u20445 ?\u23384 ?\u65292 ?\u20415 ?\u20110 ?\u21518 ?\u32493 ?\u31896 ?\u36148 ?\u23545 ?\u40784 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 5) Paste \u25805 ?\u20316 ?\u65288 ?\u31896 ?\u36148 ?\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u22312 ?\u20027 ?\u30028 ?\u38754 ?\u36873 ?\u20013 ?\u19968 ?\u20010 ? Pin\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u23558 ?\u32534 ?\u36753 ?\u20809 ?\u26631 ?\u25918 ?\u21040 ?\u30446 ?\u26631 ?\u20301 ?\u32622 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u36816 ?\u34892 ? {\f1 Paste} \u33050 ?\u26412 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel3 \b \fs24 Track Pin \u30340 ?\u31896 ?\u36148 ?\u34892 ?\u20026 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u22312 ?\u24403 ?\u21069 ?\u36873 ?\u20013 ?\u36712 ?\u36947 ?\u22788 ?\u25554 ?\u20837 ?\u26032 ?\u36712 ?\u36947 ?\u65288 ?\u26410 ?\u36873 ?\u20013 ?\u21017 ?\u36861 ?\u21152 ?\u21040 ?\u26411 ?\u23614 ?\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u24674 ?\u22797 ?\u36712 ?\u36947 ?\u32467 ?\u26500 ? + FX + Items\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u20165 ?\u20445 ?\u30041 ? Pin \u20869 ?\u37096 ?\u36712 ?\u36947 ?\u38388 ?\u30340 ?\u36335 ?\u30001 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel3 \b \fs24 Item Pin \u30340 ?\u31896 ?\u36148 ?\u34892 ?\u20026 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u33509 ?\u24403 ?\u21069 ?\u26377 ?\u36873 ?\u20013 ?\u36712 ?\u36947 ?\u65306 ?\u20197 ?\u35813 ?\u36712 ?\u36947 ?\u20026 ?\u22522 ?\u20934 ?\u31896 ?\u36148 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u33509 ?\u26080 ?\u36873 ?\u20013 ?\u36712 ?\u36947 ?\u65306 ?\u33258 ?\u21160 ?\u26032 ?\u24314 ?\u36712 ?\u36947 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel3 \b \fs24 \u23186 ?\u20307 ?\u32570 ?\u22833 ?\u26102 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u24037 ?\u20855 ?\u20173 ?\u20250 ?\u21019 ?\u24314 ? Items\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER \u20250 ?\u20197 ?\u32570 ?\u22833 ?/\u31163 ?\u32447 ?\u23186 ?\u20307 ?\u29366 ?\u24577 ?\u21576 ?\u29616 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u21487 ?\u22312 ? {\f1 userdata.log} \u26597 ?\u30475 ?\u35814 ?\u32454 ?\u25552 ?\u31034 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 6) \u25628 ?\u32034 ?\u19982 ?\u23450 ?\u20301 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u25628 ?\u32034 ?\u26694 ?\u25903 ?\u25345 ?\u27169 ?\u31946 ?\u25628 ?\u32034 ? Tracks / Items / Media / Regions / Markers\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u32467 ?\u26524 ?\u21015 ?\u34920 ?\u20026 ?\u19977 ?\u21015 ?\u65288 ?Name / Type / Project\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u21452 ?\u20987 ?\u32467 ?\u26524 ?\u21487 ?\u36339 ?\u36716 ?\u21040 ?\u24037 ?\u31243 ?\u20013 ?\u30340 ?\u30446 ?\u26631 ?\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 7) \u35774 ?\u32622 ?\u65288 ?Settings\u65289 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \u28857 ?\u20987 ?\u20027 ?\u31383 ?\u21475 ?\u21491 ?\u19978 ?\u35282 ?\u40831 ?\u36718 ?\u25171 ?\u24320 ?\u35774 ?\u32622 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u29992 ?\u25143 ?\u21306 ?\u22495 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u26174 ?\u31034 ?\u24403 ?\u21069 ?\u29992 ?\u25143 ?\u21517 ?\u19982 ?\u36335 ?\u24452 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Switch User} \u20999 ?\u25442 ?\u29992 ?\u25143 ?\u25968 ?\u25454 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Rename} \u20462 ?\u25913 ?\u29992 ?\u25143 ?\u21517 ?\u65288 ?\u21516 ?\u26102 ?\u37325 ?\u21629 ?\u21517 ? JSON\u65289 ?\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u21151 ?\u33021 ?\u21306 ?\u22495 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Debounce (ms)}\u65306 ?\u25628 ?\u32034 ?\u38450 ?\u25238 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 Max results}\u65306 ?\u26368 ?\u22823 ?\u25628 ?\u32034 ?\u32467 ?\u26524 ?\u25968 ?\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u24120 ?\u35265 ?\u38382 ?\u39064 ?\u23450 ?\u20301 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Pin \u21518 ?\u27809 ?\u30475 ?\u21040 ?\u25353 ?\u38062 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u30830 ?\u35748 ?\u24403 ?\u21069 ? Tag \u26159 ?\u21542 ?\u27491 ?\u30830 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u26597 ?\u30475 ? {\f1 userdata.log} \u26159 ?\u21542 ?\u35760 ?\u24405 ?\u20445 ?\u23384 ?\u25104 ?\u21151 ?\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u31896 ?\u36148 ?\u21518 ?\u32570 ?\u22833 ?\u23186 ?\u20307 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u26816 ?\u26597 ?\u28304 ?\u23186 ?\u20307 ?\u36335 ?\u24452 ?\u26159 ?\u21542 ?\u23384 ?\u22312 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u26597 ?\u30475 ? {\f1 userdata.log} \u20013 ?\u30340 ? missing \u35760 ?\u24405 ?\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u25628 ?\u32034 ?\u26080 ?\u32467 ?\u26524 ?\u65306 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u23581 ?\u35797 ?\u22686 ?\u22823 ? {\f1 Max results}\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u20943 ?\u23567 ? {\f1 Debounce} \u25110 ?\u31561 ?\u24453 ?\u32034 ?\u24341 ?\u21047 ?\u26032 ?\sa180\sa180\par}
+}
+]]></description></metadata></index>
