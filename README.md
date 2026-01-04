@@ -1,5 +1,9 @@
 # LaoK Clipboard 用户操作手册（V0.1）
 简单好用的Reaper夸工程搜索与常驻复制粘贴工具！！！
+使用说明：直接在Reapack订阅https://raw.githubusercontent.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/master/index.xml
+之后安装LaoK_Clipboard即可
+请务必按照初次使用教程设置
+
 本手册面向首次使用和日常使用两类场景，包含完整的安装、设置与操作流程。
 
 ## 依赖与文件清单
@@ -17,7 +21,7 @@
 
 ## 初次设置教程（一步一步）
 
-### 1) 导入脚本到 Action List
+### 1) 导入脚本到 Action List（订阅Repack可忽略）
 1. 打开 REAPER：`Actions -> Show action list...`
 2. 点击 `ReaScript: Load...`
 3. 依次选择并加载（共 5 个脚本）：
@@ -27,7 +31,7 @@
    - `LaoK_Clipboard_Toolbar_Toggle.lua`
    - `LaoK_Clipboard_Shared.lua`
 
-### 2) 设置 Main 为全局启动（SWS）
+### 2) 设置 Main 为全局启动（SWS）【必做！】
 1. 菜单进入：`Extensions -> Startup actions -> Set global startup actions...`
 2. 点击 `Add`
 3. 在 Action 列表中找到 `Script: LaoK_Clipboard_Main.lua`，添加并确认
@@ -37,10 +41,10 @@
 1. 右键主工具栏空白处 -> `Customize toolbar...`
 2. 点击 `Add`
 3. 搜索并选择 `Script: LaoK_Clipboard_Toolbar_Toggle.lua`
-4. 选择图标并确认
+4. 选择一个你喜欢的图标并确认
 5. 该按钮用于显示/隐藏主窗口（脚本常驻时再次点击会切换显示）
 
-### 4) 为 Pin / Paste 设置快捷键（推荐）
+### 4) 为 Pin / Paste 设置快捷键（推荐）【强烈建议给顺手快捷键shift+C/V很舒适！】
 1. 打开 Action List
 2. 搜索并选中：
    - `Script: LaoK_Clipboard_Action_Pin.lua`
