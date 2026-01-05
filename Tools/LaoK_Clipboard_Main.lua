@@ -1,5 +1,5 @@
 -- @description LaoK Clipboard (Main + Actions)
--- @version 0.1.2
+-- @version 0.1.2.1
 -- @author sadnessken
 -- @about
 --   LaoK_Clipboard：REAPER 常驻窗口工具（Pin/Paste/Toolbar Toggle 等脚本打包安装）。
@@ -493,7 +493,7 @@ local function draw_title_bar()
 
   reaper.ImGui_DrawList_AddRectFilled(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_bg, 0)
   reaper.ImGui_DrawList_AddRect(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_border, 0, 0, 1.2)
-  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.12")
+  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.121")
 
   local icon_size = 14
   local pad = 12
@@ -1243,21 +1243,24 @@ local function draw_settings()
     if user_ok then
       local user_name = state.user_data.user_name or "DefaultUser"
       reaper.ImGui_Text(ctx, "User: " .. user_name)
-      local btn_h = 24
-      local btn_w = 90
-      local total = btn_w * 2 + 8
+    local btn_h = 30
+    local switch_label = "Switch User"
+    local rename_label = "Rename"
+    local switch_w = reaper.ImGui_CalcTextSize(ctx, switch_label) + 24
+    local rename_w = reaper.ImGui_CalcTextSize(ctx, rename_label) + 24
+    local total = switch_w + rename_w + 8
       local avail_w = reaper.ImGui_GetContentRegionAvail(ctx)
       local cursor_x = reaper.ImGui_GetCursorPosX(ctx)
       local region_max_x = cursor_x + (avail_w or 0)
       reaper.ImGui_SameLine(ctx)
       reaper.ImGui_SetCursorPosX(ctx, math.max(region_max_x - total, cursor_x))
-      if reaper.ImGui_Button(ctx, "Switch User", btn_w, btn_h) then
-        do_load_user_data()
-      end
-      reaper.ImGui_SameLine(ctx)
-      if reaper.ImGui_Button(ctx, "Rename", btn_w, btn_h) then
-        start_rename_user_flow()
-      end
+    if centered_button(switch_label, "settings_switch_user", switch_w, btn_h, COLORS.text_dark) then
+      do_load_user_data()
+    end
+    reaper.ImGui_SameLine(ctx)
+    if centered_button(rename_label, "settings_rename_user", rename_w, btn_h, COLORS.text_dark) then
+      start_rename_user_flow()
+    end
 
       local path_text = state.current_path ~= "" and state.current_path or "<no user data>"
       reaper.ImGui_Text(ctx, "Path: " .. path_text)
@@ -1301,7 +1304,7 @@ end
 local function draw_user_setup()
   if not state.needs_user_setup then return end
   push_global_style()
-  reaper.ImGui_SetNextWindowSize(ctx, 250, 130, reaper.ImGui_Cond_Appearing())
+  reaper.ImGui_SetNextWindowSize(ctx, 360, 160, reaper.ImGui_Cond_FirstUseEver())
   local flags = reaper.ImGui_WindowFlags_NoTitleBar() |
     reaper.ImGui_WindowFlags_NoResize() |
     reaper.ImGui_WindowFlags_NoCollapse() |
@@ -1316,11 +1319,11 @@ local function draw_user_setup()
     reaper.ImGui_SetCursorPos(ctx, 12, title_h + 12)
     reaper.ImGui_Text(ctx, "未找到用户数据，请先设定用户信息。")
     reaper.ImGui_Dummy(ctx, 0, 12)
-    if reaper.ImGui_Button(ctx, "新建", 100, 28) then
+    if centered_button("New", "user_setup_new", 120, 30, COLORS.text_dark) then
       start_new_user_flow()
     end
     reaper.ImGui_SameLine(ctx)
-    if reaper.ImGui_Button(ctx, "打开已有", 120, 28) then
+    if centered_button("Open", "user_setup_open", 120, 30, COLORS.text_dark) then
       do_load_user_data()
     end
     reaper.ImGui_End(ctx)
@@ -1334,7 +1337,7 @@ local function draw_user_name_prompt()
     reaper.ImGui_OpenPopup(ctx, "UserNamePrompt")
     state.user_name_prompt_open = false
   end
-  reaper.ImGui_SetNextWindowSize(ctx, 250, 130, reaper.ImGui_Cond_Appearing())
+  reaper.ImGui_SetNextWindowSize(ctx, 320, 170, reaper.ImGui_Cond_FirstUseEver())
   local popup_flags = 0
   if reaper.ImGui_WindowFlags_NoDocking then
     popup_flags = popup_flags | reaper.ImGui_WindowFlags_NoDocking()
@@ -1348,8 +1351,12 @@ local function draw_user_name_prompt()
   if popup_visible then
     reaper.ImGui_Text(ctx, "请创建用户名")
     local changed
+    local avail_w = reaper.ImGui_GetContentRegionAvail(ctx)
+    local input_w = math.max(120, math.floor((avail_w or 0) * 0.5))
+    reaper.ImGui_PushItemWidth(ctx, input_w)
     changed, state.user_name_prompt_text = reaper.ImGui_InputText(ctx, "Name", state.user_name_prompt_text)
-    local ok = reaper.ImGui_Button(ctx, "OK", 80, 24)
+    reaper.ImGui_PopItemWidth(ctx)
+    local ok = centered_button("OK", "user_name_ok", 120, 30, COLORS.text_dark)
     if ok then
       local name = common.Trim(state.user_name_prompt_text)
       if name ~= "" then
@@ -1369,7 +1376,7 @@ local function draw_user_name_prompt()
     end
     if not state.user_name_prompt_force then
       reaper.ImGui_SameLine(ctx)
-      if reaper.ImGui_Button(ctx, "Cancel", 80, 24) then
+      if centered_button("Cancel", "user_name_cancel", 120, 30, COLORS.text_dark) then
         state.user_name_prompt_mode = ""
         state.pending_user_dir = ""
         state.user_name_prompt_force = false
@@ -1617,11 +1624,11 @@ local function draw_pins()
     state.move_pin_open = false
   end
 
-  reaper.ImGui_SetNextWindowSize(ctx, 320, 140, reaper.ImGui_Cond_Appearing())
+  reaper.ImGui_SetNextWindowSize(ctx, 360, 160, reaper.ImGui_Cond_FirstUseEver())
   if reaper.ImGui_BeginPopupModal(ctx, "Add Tag", true) then
     local changed
     changed, state.add_tag_text = reaper.ImGui_InputText(ctx, "Name", state.add_tag_text)
-    if reaper.ImGui_Button(ctx, "Create", 80, 24) then
+    if centered_button("Create", "add_tag_create", 110, 30, COLORS.text_dark) then
       local name = common.Trim(state.add_tag_text)
       if name ~= "" then
         local tag_id = "tag_" .. common.GenerateId()
@@ -1633,17 +1640,17 @@ local function draw_pins()
       reaper.ImGui_CloseCurrentPopup(ctx)
     end
     reaper.ImGui_SameLine(ctx)
-    if reaper.ImGui_Button(ctx, "Cancel", 80, 24) then
+    if centered_button("Cancel", "add_tag_cancel", 110, 30, COLORS.text_dark) then
       reaper.ImGui_CloseCurrentPopup(ctx)
     end
     reaper.ImGui_EndPopup(ctx)
   end
 
-  reaper.ImGui_SetNextWindowSize(ctx, 320, 140, reaper.ImGui_Cond_Appearing())
+  reaper.ImGui_SetNextWindowSize(ctx, 320, 150, reaper.ImGui_Cond_FirstUseEver())
   if reaper.ImGui_BeginPopupModal(ctx, "Rename Pin", true) then
     local changed
     changed, state.rename_text = reaper.ImGui_InputText(ctx, "Name", state.rename_text)
-    if reaper.ImGui_Button(ctx, "OK", 70, 24) then
+    if centered_button("OK", "rename_pin_ok", 110, 30, COLORS.text_dark) then
       for _, pin in ipairs(pins) do
         if pin.pin_id == state.rename_pin_id then
           pin.pin_name = state.rename_text
@@ -1655,18 +1662,18 @@ local function draw_pins()
       reaper.ImGui_CloseCurrentPopup(ctx)
     end
     reaper.ImGui_SameLine(ctx)
-    if reaper.ImGui_Button(ctx, "Cancel", 70, 24) then
+    if centered_button("Cancel", "rename_pin_cancel", 110, 30, COLORS.text_dark) then
       state.rename_pin_id = nil
       reaper.ImGui_CloseCurrentPopup(ctx)
     end
     reaper.ImGui_EndPopup(ctx)
   end
 
-  reaper.ImGui_SetNextWindowSize(ctx, 320, 140, reaper.ImGui_Cond_Appearing())
+  reaper.ImGui_SetNextWindowSize(ctx, 320, 150, reaper.ImGui_Cond_FirstUseEver())
   if reaper.ImGui_BeginPopupModal(ctx, "Rename Tag", true) then
     local changed
     changed, state.rename_tag_text = reaper.ImGui_InputText(ctx, "Name", state.rename_tag_text)
-    if reaper.ImGui_Button(ctx, "OK", 70, 24) then
+    if centered_button("OK", "rename_tag_ok", 110, 30, COLORS.text_dark) then
       for _, tag in ipairs(tags) do
         if tag.tag_id == state.rename_tag_id then
           tag.name = state.rename_tag_text
@@ -1678,7 +1685,7 @@ local function draw_pins()
       reaper.ImGui_CloseCurrentPopup(ctx)
     end
     reaper.ImGui_SameLine(ctx)
-    if reaper.ImGui_Button(ctx, "Cancel", 70, 24) then
+    if centered_button("Cancel", "rename_tag_cancel", 110, 30, COLORS.text_dark) then
       state.rename_tag_id = nil
       reaper.ImGui_CloseCurrentPopup(ctx)
     end
@@ -1832,6 +1839,27 @@ local function clamp_to_viewport(x, y, w, h)
   return x, y
 end
 
+local function get_main_window_rect()
+  if not (reaper.GetMainHwnd and reaper.JS_Window_GetRect) then return nil end
+  local hwnd = reaper.GetMainHwnd()
+  if not hwnd then return nil end
+  local ok, l, t, r, b = pcall(reaper.JS_Window_GetRect, hwnd)
+  if ok and l and t and r and b then
+    return l, t, r, b
+  end
+  return nil
+end
+
+local function get_first_run_window_pos(w, h)
+  local l, t, r, b = get_main_window_rect()
+  if l and t and r and b then
+    local x = l + 60
+    local y = t + 60
+    return clamp_to_viewport(x, y, w, h)
+  end
+  return 120, 120
+end
+
 local function ensure_settings_table()
   if not state.user_data.settings then
     state.user_data.settings = common.DefaultSettings()
@@ -1928,7 +1956,7 @@ local function loop()
         x, y = get_saved_main_window_pos()
       end
       if not x or not y then
-        x, y = 120, 120
+        x, y = get_first_run_window_pos(desired_w, desired_h)
       end
       x, y = clamp_to_viewport(x, y, desired_w, desired_h)
       reaper.ImGui_SetNextWindowPos(ctx, x, y, reaper.ImGui_Cond_Always())
