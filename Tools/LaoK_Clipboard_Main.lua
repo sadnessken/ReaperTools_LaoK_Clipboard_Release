@@ -1,5 +1,5 @@
 -- @description LaoK Clipboard (Main + Actions)
--- @version 0.1.0
+-- @version 0.1.1
 -- @author sadnessken
 -- @about
 --   LaoK_Clipboard：REAPER 常驻窗口工具（Pin/Paste/Toolbar Toggle 等脚本打包安装）。
@@ -286,14 +286,27 @@ state = {
   user_name_prompt_mode = "",
   user_name_prompt_force = false,
   pending_user_dir = "",
+
+  -- Window position management (avoid ImGui ini off-screen lock)
+  win_pos_apply = true,            -- apply saved/forced pos on next show
+  win_force_x = nil,
+  win_force_y = nil,
+  last_win_x = nil,
+  last_win_y = nil,
+  last_win_save_t = 0,
 }
 
 local ui_visible = reaper.GetExtState(SECTION, "ui_visible")
 ui_visible = (ui_visible ~= "0")
 
 local function set_ui_visible(v)
+  local was = ui_visible
   ui_visible = v
   reaper.SetExtState(SECTION, "ui_visible", v and "1" or "0", false)
+  -- When showing the window again, re-apply a safe position (prevents saved off-screen lock)
+  if (not was) and v then
+    state.win_pos_apply = true
+  end
 end
 
 local function consume_toggle_request()
@@ -433,7 +446,7 @@ local function draw_title_bar()
 
   reaper.ImGui_DrawList_AddRectFilled(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_bg, 0)
   reaper.ImGui_DrawList_AddRect(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_border, 0, 0, 1.2)
-  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.1")
+  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.11")
 
   local icon_size = 14
   local pad = 12
@@ -959,9 +972,24 @@ local function rename_current_user(user_name)
 end
 
 local function start_new_user_flow()
-  local ok, path = prompt_save_path("New User Data", "json")
-  if not ok or path == "" then return end
-  state.pending_user_dir = common.DirName(path)
+  -- New User Data: choose target folder (JS_ReaScriptAPI required).
+  -- The selected folder is the final storage directory.
+  if not reaper.JS_Dialog_BrowseForFolder then
+    reaper.ShowMessageBox(
+      "JS_ReaScriptAPI is required to create new user data.\n\n" ..
+      "Please install JS_ReaScriptAPI, then retry.",
+      "LaoK Clipboard",
+      0
+    )
+    return
+  end
+
+  local ok, folder = reaper.JS_Dialog_BrowseForFolder("Select User Data Folder", "")
+  if not ok or not folder or folder == "" then return end
+
+  -- Normalize: remove trailing slashes
+  folder = tostring(folder):gsub("[/\\]+$", "")
+  state.pending_user_dir = folder
   state.user_name_prompt_text = "DefaultUser"
   state.user_name_prompt_mode = "new"
   state.user_name_prompt_force = true
@@ -1109,12 +1137,12 @@ local function draw_settings()
   local desired_h = math.floor(title_h_fixed + 12 + user_h + gap + settings_h + 10)
   reaper.ImGui_SetNextWindowSize(ctx, 720, desired_h, reaper.ImGui_Cond_Always())
   local flags = reaper.ImGui_WindowFlags_NoTitleBar() |
-    reaper.ImGui_WindowFlags_NoResize() |
-    reaper.ImGui_WindowFlags_NoCollapse() |
-    reaper.ImGui_WindowFlags_NoScrollbar() |
-    reaper.ImGui_WindowFlags_NoScrollWithMouse()
+      reaper.ImGui_WindowFlags_NoResize() |
+      reaper.ImGui_WindowFlags_NoCollapse() |
+      reaper.ImGui_WindowFlags_NoScrollbar() |
+      reaper.ImGui_WindowFlags_NoScrollWithMouse()
   if reaper.ImGui_WindowFlags_NoDocking then
-    flags = flags | reaper.ImGui_WindowFlags_NoDocking()
+    flags = flags | reaper.ImGui_WindowFlags_NoDocking() | reaper.ImGui_WindowFlags_NoSavedSettings()
   end
   local visible, open = reaper.ImGui_Begin(ctx, "Settings", true, flags)
   if visible then
@@ -1194,7 +1222,7 @@ local function draw_user_setup()
     reaper.ImGui_WindowFlags_NoScrollbar() |
     reaper.ImGui_WindowFlags_NoScrollWithMouse()
   if reaper.ImGui_WindowFlags_NoDocking then
-    flags = flags | reaper.ImGui_WindowFlags_NoDocking()
+    flags = flags | reaper.ImGui_WindowFlags_NoDocking() | reaper.ImGui_WindowFlags_NoSavedSettings()
   end
   local visible = reaper.ImGui_Begin(ctx, "User Setup", true, flags)
   if visible then
@@ -1557,6 +1585,71 @@ local function draw_header()
   draw_search_results()
 end
 
+
+-- ---------------------------------------------------------------------------
+-- Window position helpers
+--   Goal: avoid "off-screen lock" when user drags the window across monitors.
+--   We DO NOT rely on ImGui ini persistence; we clamp and persist ourselves.
+-- ---------------------------------------------------------------------------
+local function clamp_to_viewport(x, y, w, h)
+  if not x or not y or not w or not h then return x, y end
+  if not reaper.my_getViewport then return x, y end
+  -- REAPER's my_getViewport Lua signature expects 9 params:
+  --   r.left, r.top, r.right, r.bot, sr.left, sr.top, sr.right, sr.bot, wantWorkArea
+  local ok, l, t, r, b = pcall(reaper.my_getViewport, 0, 0, 0, 0, x, y, x + w, y + h, true)
+  if not ok or not l then return x, y end
+
+  local pad = 20
+  local min_x = l + pad
+  local min_y = t + pad
+  local max_x = (r - w) - pad
+  local max_y = (b - h) - pad
+
+  if max_x < min_x then
+    x = l + math.max(0, (r - l - w) * 0.5)
+  else
+    x = math.max(min_x, math.min(x, max_x))
+  end
+
+  if max_y < min_y then
+    y = t + math.max(0, (b - t - h) * 0.5)
+  else
+    y = math.max(min_y, math.min(y, max_y))
+  end
+
+  return x, y
+end
+
+local function ensure_settings_table()
+  if not state.user_data.settings then
+    state.user_data.settings = common.DefaultSettings()
+  end
+  return state.user_data.settings
+end
+
+local function get_saved_main_window_pos()
+  local s = ensure_settings_table()
+  local x = tonumber(s.win_x)
+  local y = tonumber(s.win_y)
+  if not x or not y then
+    x = tonumber(common.GetExtState("win_x"))
+    y = tonumber(common.GetExtState("win_y"))
+  end
+  return x, y
+end
+
+local function save_main_window_pos(x, y)
+  local s = ensure_settings_table()
+  s.win_x, s.win_y = x, y
+  -- Also keep a fallback in ExtState so it works before a user-data file exists
+  common.SetExtState("win_x", tostring(x))
+  common.SetExtState("win_y", tostring(y))
+  if state.current_path ~= "" then
+    set_dirty(true)
+  end
+end
+
+
 local function loop()
   local now = reaper.time_precise()
   consume_toggle_request()
@@ -1609,9 +1702,35 @@ local function loop()
       reaper.ImGui_WindowFlags_NoCollapse() |
       reaper.ImGui_WindowFlags_NoScrollbar() |
       reaper.ImGui_WindowFlags_NoScrollWithMouse()
+    if reaper.ImGui_WindowFlags_NoDocking then
+      flags = flags | reaper.ImGui_WindowFlags_NoDocking()
+    end
+    if reaper.ImGui_WindowFlags_NoSavedSettings then
+      flags = flags | reaper.ImGui_WindowFlags_NoSavedSettings()
+    end
+
+    -- Apply safe window position (once) before Begin (prevents off-screen lock)
+    if state.win_pos_apply then
+      local x, y = state.win_force_x, state.win_force_y
+      if not x or not y then
+        x, y = get_saved_main_window_pos()
+      end
+      if not x or not y then
+        x, y = 120, 120
+      end
+      x, y = clamp_to_viewport(x, y, desired_w, desired_h)
+      reaper.ImGui_SetNextWindowPos(ctx, x, y, reaper.ImGui_Cond_Always())
+    end
+
     local visible
     visible, open = reaper.ImGui_Begin(ctx, "LaoK Clipboard", true, flags)
     if visible then
+      -- clear one-shot apply after a successful Begin
+      if state.win_pos_apply then
+        state.win_pos_apply = false
+        state.win_force_x, state.win_force_y = nil, nil
+      end
+
       local title_h, hide_clicked, settings_clicked = draw_title_bar()
       if settings_clicked then
         state.settings_open = true
@@ -1625,6 +1744,28 @@ local function loop()
       reaper.ImGui_Dummy(ctx, 0, 8)
       draw_pins()
       reaper.ImGui_Dummy(ctx, 0, 8)
+
+
+      -- Persist and clamp window position (debounced)
+      do
+        local wx, wy = reaper.ImGui_GetWindowPos(ctx)
+        if wx and wy then
+          local cx, cy = clamp_to_viewport(wx, wy, desired_w, desired_h)
+          if (math.abs(cx - wx) > 1) or (math.abs(cy - wy) > 1) then
+            -- If off-screen, force a safe position next frame
+            state.win_force_x, state.win_force_y = cx, cy
+            state.win_pos_apply = true
+          end
+
+          local now = reaper.time_precise()
+          local moved = (not state.last_win_x) or (math.abs(wx - state.last_win_x) > 0.5) or (math.abs(wy - state.last_win_y) > 0.5)
+          if moved and (now - (state.last_win_save_t or 0)) > 0.25 then
+            state.last_win_x, state.last_win_y = wx, wy
+            state.last_win_save_t = now
+            save_main_window_pos(wx, wy)
+          end
+        end
+      end
 
       reaper.ImGui_End(ctx)
     end
