@@ -202,6 +202,27 @@ local function build_peaks_for_items(items)
   restore_selected_items(prev)
 end
 
+local function collect_missing_from_items(items, project_path)
+  local missing = {}
+  for _, item in ipairs(items or {}) do
+    local take_count = reaper.CountTakes(item)
+    for t = 0, take_count - 1 do
+      local take = reaper.GetTake(item, t)
+      if take then
+        local src = reaper.GetMediaItemTake_Source(take)
+        local path = common.GetMediaSourceFileNameSafe(src)
+        if path ~= "" then
+          local abs = common.ResolveMaybeRelativePath(path, project_path)
+          if abs ~= "" and not common.FileExists(abs) then
+            missing[abs] = true
+          end
+        end
+      end
+    end
+  end
+  return missing
+end
+
 local function ensure_track_at_index(index)
   local track_count = reaper.CountTracks(0)
   while track_count < index do
@@ -378,8 +399,9 @@ local function run()
   reaper.TrackList_AdjustWindows(false)
   reaper.UpdateArrange()
 
+  local missing_created = collect_missing_from_items(created_items, proj_path)
   local missing_list = {}
-  for path_key in pairs(missing) do
+  for path_key in pairs(missing_created) do
     if path_key ~= "" then
       missing_list[#missing_list + 1] = path_key
     end

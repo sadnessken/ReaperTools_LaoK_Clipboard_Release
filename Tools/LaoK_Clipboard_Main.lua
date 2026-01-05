@@ -1,5 +1,5 @@
 -- @description LaoK Clipboard (Main + Actions)
--- @version 0.1.1
+-- @version 0.1.2
 -- @author sadnessken
 -- @about
 --   LaoK_Clipboard：REAPER 常驻窗口工具（Pin/Paste/Toolbar Toggle 等脚本打包安装）。
@@ -82,6 +82,42 @@ if not ctx then
   return
 end
 
+local font_ui = nil
+local font_ui_size = 15
+local font_ui_pushed = false
+do
+  if reaper.ImGui_CreateFont and reaper.ImGui_Attach then
+    local os = reaper.GetOS and reaper.GetOS() or ""
+    local font_name = "sans-serif"
+    local font_size = 15
+    if os:match("Win") then
+      font_name = "Segoe UI"
+      font_size = 16
+    end
+    local ok_font, f = pcall(function()
+      return reaper.ImGui_CreateFont(font_name, font_size)
+    end)
+    if ok_font and f then
+      font_ui = f
+      font_ui_size = font_size
+      reaper.ImGui_Attach(ctx, font_ui)
+    end
+  end
+end
+
+local function push_font_ui()
+  if not (font_ui and reaper.ImGui_PushFont) then return false end
+  local ok = pcall(reaper.ImGui_PushFont, ctx, font_ui, font_ui_size)
+  if ok then return true end
+  ok = pcall(reaper.ImGui_PushFont, ctx, font_ui)
+  return ok and true or false
+end
+
+local function pop_font_ui()
+  if not reaper.ImGui_PopFont then return end
+  pcall(reaper.ImGui_PopFont, ctx)
+end
+
 local state
 
 local function hex_color(hex, alpha)
@@ -109,6 +145,7 @@ local COLORS = {
   pin_hover = hex_color(0x33506F),
   pin_active = hex_color(0x2D4666),
   text = hex_color(0xD1E6F2),
+  text_soft = hex_color(0xD1E6F2, 0.7),
   text_dark = hex_color(0x000000),
   border_big = hex_color(0x29405C),
   border_card = hex_color(0x334E77),
@@ -119,6 +156,7 @@ local COLORS = {
 }
 
 local function push_global_style()
+  font_ui_pushed = push_font_ui()
   reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_WindowPadding(), 12, 10)
   reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_FramePadding(), 10, 8)
   reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_ItemSpacing(), 8, 6)
@@ -141,6 +179,10 @@ end
 local function pop_global_style()
   reaper.ImGui_PopStyleColor(ctx, 11)
   reaper.ImGui_PopStyleVar(ctx, 5)
+  if font_ui_pushed then
+    pop_font_ui()
+    font_ui_pushed = false
+  end
 end
 
 local function push_button_colors(bg, hover, active, text)
@@ -258,6 +300,7 @@ state = {
   search_text = "",
   search_results = {},
   search_dirty = false,
+  search_filter = nil,
   last_search_change = 0,
   project_index = {},
   last_index_poll = 0,
@@ -276,6 +319,10 @@ state = {
   rename_tag_open = false,
   add_tag_open = false,
   add_tag_text = "",
+  move_pin_id = nil,
+  move_pin_open = false,
+  move_pin_target_tag_id = "",
+  move_pin_new_tag = "",
   last_report_raw = "",
   last_report = nil,
   last_dirty_time = 0,
@@ -446,7 +493,7 @@ local function draw_title_bar()
 
   reaper.ImGui_DrawList_AddRectFilled(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_bg, 0)
   reaper.ImGui_DrawList_AddRect(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_border, 0, 0, 1.2)
-  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.11")
+  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.12")
 
   local icon_size = 14
   local pad = 12
@@ -503,6 +550,18 @@ local function button_black_text(label, w, h)
   reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Text(), COLORS.text_dark)
   local clicked = reaper.ImGui_Button(ctx, label, w, h)
   reaper.ImGui_PopStyleColor(ctx)
+  return clicked
+end
+
+local function centered_button(text, id, w, h, text_color)
+  local clicked = reaper.ImGui_Button(ctx, "##" .. id, w, h)
+  local draw_list = reaper.ImGui_GetWindowDrawList(ctx)
+  local min_x, min_y = reaper.ImGui_GetItemRectMin(ctx)
+  local max_x, max_y = reaper.ImGui_GetItemRectMax(ctx)
+  local text_w, text_h = reaper.ImGui_CalcTextSize(ctx, text)
+  local x = min_x + (max_x - min_x - text_w) / 2
+  local y = min_y + (max_y - min_y - text_h) / 2
+  reaper.ImGui_DrawList_AddText(draw_list, x, y, text_color or COLORS.text, text)
   return clicked
 end
 
@@ -806,8 +865,23 @@ local function score_entry(entry, tokens, query, fuzzy, current_proj)
   return score
 end
 
+local function parse_search_filter(text)
+  local raw = text or ""
+  local raw_lower = raw:lower()
+  local filter = nil
+  if raw_lower:sub(1, 3) == "-i " then
+    filter = "ITEM"
+    raw = raw:sub(4)
+  elseif raw_lower:sub(1, 3) == "-t " then
+    filter = "TRACK"
+    raw = raw:sub(4)
+  end
+  return filter, raw
+end
+
 local function run_search()
-  local query = common.Trim(state.search_text):lower()
+  local type_filter, raw = parse_search_filter(state.search_text)
+  local query = common.Trim(raw):lower()
   if query == "" then
     state.search_results = {}
     return
@@ -820,10 +894,14 @@ local function run_search()
   local results = {}
   for _, proj_data in pairs(state.project_index) do
     for _, entry in ipairs(proj_data.entries) do
+      if type_filter and entry.type ~= type_filter then
+        goto continue
+      end
       local score = score_entry(entry, tokens, query, fuzzy, current_proj)
       if score then
         results[#results + 1] = { entry = entry, score = score }
       end
+      ::continue::
     end
   end
 
@@ -843,6 +921,7 @@ end
 
 local function select_track(track)
   if not track then return end
+  reaper.Main_OnCommand(40297, 0)
   reaper.Main_OnCommand(40296, 0)
   reaper.SetOnlyTrackSelected(track)
   reaper.Main_OnCommand(40913, 0)
@@ -850,12 +929,19 @@ end
 
 local function select_item(item)
   if not item then return end
-  reaper.Main_OnCommand(40297, 0)
-  reaper.SetMediaItemSelected(item, true)
+  local sel_count = reaper.CountSelectedMediaItems(0)
+  for i = sel_count - 1, 0, -1 do
+    local sel = reaper.GetSelectedMediaItem(0, i)
+    if sel then
+      reaper.SetMediaItemSelected(sel, false)
+    end
+  end
+  reaper.Main_OnCommand(40296, 0)
   local track = reaper.GetMediaItemTrack(item)
   if track then
-    reaper.SetTrackSelected(track, true)
+    reaper.SetOnlyTrackSelected(track)
   end
+  reaper.SetMediaItemSelected(item, true)
   reaper.Main_OnCommand(40914, 0)
 end
 
@@ -1302,23 +1388,34 @@ local function draw_search_results()
   local ok = begin_child("SearchDropdown", -1, height, true)
   if ok then
     local avail = reaper.ImGui_GetContentRegionAvail(ctx)
+    local pop_colors = 0
+    if reaper.ImGui_Col_Border then
+      reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Border(), COLORS.text_dark)
+      pop_colors = pop_colors + 1
+    end
+    if reaper.ImGui_Col_Separator then
+      reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Separator(), COLORS.text_dark)
+      pop_colors = pop_colors + 1
+    end
     if reaper.ImGui_BeginTable then
       local flags = reaper.ImGui_TableFlags_BordersInnerV() |
         reaper.ImGui_TableFlags_RowBg() |
         reaper.ImGui_TableFlags_Resizable()
       if reaper.ImGui_BeginTable(ctx, "SearchTable", 3, flags, avail) then
-        reaper.ImGui_TableSetupColumn(ctx, "Name", reaper.ImGui_TableColumnFlags_WidthStretch(), 2.0)
-        reaper.ImGui_TableSetupColumn(ctx, "Type", reaper.ImGui_TableColumnFlags_WidthStretch(), 1.0)
-        reaper.ImGui_TableSetupColumn(ctx, "Project", reaper.ImGui_TableColumnFlags_WidthStretch(), 1.0)
+        local type_w = 90
+        local proj_w = 140
+        reaper.ImGui_TableSetupColumn(ctx, "Name", reaper.ImGui_TableColumnFlags_WidthStretch(), 1.0)
+        reaper.ImGui_TableSetupColumn(ctx, "Type", reaper.ImGui_TableColumnFlags_WidthFixed(), type_w)
+        reaper.ImGui_TableSetupColumn(ctx, "Project", reaper.ImGui_TableColumnFlags_WidthFixed(), proj_w)
         for i, entry in ipairs(state.search_results) do
           reaper.ImGui_TableNextRow(ctx)
           reaper.ImGui_TableSetColumnIndex(ctx, 0)
           local label = entry.display_name .. "##sr" .. tostring(i)
           if reaper.ImGui_Selectable(ctx, label, false, reaper.ImGui_SelectableFlags_SpanAllColumns()) then
-            -- single click
-          end
-          if reaper.ImGui_IsItemHovered(ctx) and reaper.ImGui_IsMouseDoubleClicked(ctx, 0) then
             jump_to_entry(entry)
+          end
+          if reaper.ImGui_SetTooltip and reaper.ImGui_IsItemHovered(ctx) then
+            reaper.ImGui_SetTooltip(ctx, entry.display_name)
           end
           reaper.ImGui_TableSetColumnIndex(ctx, 1)
           reaper.ImGui_Text(ctx, entry.type)
@@ -1329,17 +1426,19 @@ local function draw_search_results()
       end
     else
       reaper.ImGui_Columns(ctx, 3, "SearchCols", false)
-      local unit = math.max(math.floor(avail / 4), 1)
-      reaper.ImGui_SetColumnWidth(ctx, 0, unit * 2)
-      reaper.ImGui_SetColumnWidth(ctx, 1, unit)
-      reaper.ImGui_SetColumnWidth(ctx, 2, unit)
+      local type_w = 90
+      local proj_w = 140
+      local name_w = math.max(avail - type_w - proj_w, 120)
+      reaper.ImGui_SetColumnWidth(ctx, 0, name_w)
+      reaper.ImGui_SetColumnWidth(ctx, 1, type_w)
+      reaper.ImGui_SetColumnWidth(ctx, 2, proj_w)
       for i, entry in ipairs(state.search_results) do
         local label = entry.display_name .. "##sr" .. tostring(i)
         if reaper.ImGui_Selectable(ctx, label, false, reaper.ImGui_SelectableFlags_SpanAllColumns()) then
-          -- single click
-        end
-        if reaper.ImGui_IsItemHovered(ctx) and reaper.ImGui_IsMouseDoubleClicked(ctx, 0) then
           jump_to_entry(entry)
+        end
+        if reaper.ImGui_SetTooltip and reaper.ImGui_IsItemHovered(ctx) then
+          reaper.ImGui_SetTooltip(ctx, entry.display_name)
         end
         reaper.ImGui_NextColumn(ctx)
         reaper.ImGui_Text(ctx, entry.type)
@@ -1348,6 +1447,9 @@ local function draw_search_results()
         reaper.ImGui_NextColumn(ctx)
       end
       reaper.ImGui_Columns(ctx, 1)
+    end
+    if pop_colors > 0 then
+      reaper.ImGui_PopStyleColor(ctx, pop_colors)
     end
     reaper.ImGui_EndChild(ctx)
   end
@@ -1377,13 +1479,14 @@ local function draw_pins()
   if tag_child_ok then
     for i, tag in ipairs(tags) do
       local is_active = tag.tag_id == state.selected_tag_id
+      local text_color = is_active and COLORS.text_dark or COLORS.text
       local pop_colors
       if is_active then
-        pop_colors = push_button_colors(COLORS.teal, COLORS.teal_hover, COLORS.teal_active, COLORS.text_dark)
+        pop_colors = push_button_colors(COLORS.teal, COLORS.teal_hover, COLORS.teal_active)
       else
-        pop_colors = push_button_colors(COLORS.tag_idle, COLORS.tag_hover, COLORS.tag_active, COLORS.text)
+        pop_colors = push_button_colors(COLORS.tag_idle, COLORS.tag_hover, COLORS.tag_active)
       end
-      if reaper.ImGui_Button(ctx, tag.name .. "##tag" .. i, -1, tag_btn_h) then
+      if centered_button(tag.name, "tag_btn_" .. tag.tag_id, -1, tag_btn_h, text_color) then
         state.selected_tag_id = tag.tag_id
         common.SetExtState("selected_tag_id", state.selected_tag_id)
       end
@@ -1412,8 +1515,8 @@ local function draw_pins()
         reaper.ImGui_EndPopup(ctx)
       end
     end
-    local pop_colors = push_button_colors(COLORS.tag_idle, COLORS.tag_hover, COLORS.tag_active, COLORS.text)
-    if reaper.ImGui_Button(ctx, "+ Add Tag", -1, tag_btn_h) then
+    local pop_colors = push_button_colors(COLORS.tag_idle, COLORS.tag_hover, COLORS.tag_active)
+    if centered_button("+ Add Tag", "tag_add", -1, tag_btn_h, COLORS.text) then
       state.add_tag_open = true
       state.add_tag_text = ""
     end
@@ -1441,22 +1544,33 @@ local function draw_pins()
       local remove_pin_id = nil
       for i, pin in ipairs(filtered) do
         local is_selected = pin.pin_id == state.selected_pin_id
+        local text_color = is_selected and COLORS.text_dark or COLORS.text
         local pop_colors
         if is_selected then
-          pop_colors = push_button_colors(COLORS.teal, COLORS.teal_hover, COLORS.teal_active, COLORS.text_dark)
+          pop_colors = push_button_colors(COLORS.teal, COLORS.teal_hover, COLORS.teal_active)
         else
-          pop_colors = push_button_colors(COLORS.pin_idle, COLORS.pin_hover, COLORS.pin_active, COLORS.text)
+          pop_colors = push_button_colors(COLORS.pin_idle, COLORS.pin_hover, COLORS.pin_active)
         end
-        if reaper.ImGui_Button(ctx, pin.pin_name .. "##pin" .. pin.pin_id, btn_w, grid_btn_h) then
+        if centered_button(pin.pin_name, "pin_btn_" .. pin.pin_id, btn_w, grid_btn_h, text_color) then
           state.selected_pin_id = pin.pin_id
           common.SetExtState("selected_pin_id", state.selected_pin_id)
         end
+        local label = pin.pin_type == "TRACKS" and "TRACK" or "ITEM"
+        local min_x, min_y = reaper.ImGui_GetItemRectMin(ctx)
+        local draw_list = reaper.ImGui_GetWindowDrawList(ctx)
+        reaper.ImGui_DrawList_AddText(draw_list, min_x + 6, min_y + 4, COLORS.text_soft, label)
         reaper.ImGui_PopStyleColor(ctx, pop_colors)
         if reaper.ImGui_BeginPopupContextItem(ctx) then
           if reaper.ImGui_MenuItem(ctx, "Rename") then
             state.rename_pin_id = pin.pin_id
             state.rename_text = pin.pin_name
             state.rename_pin_open = true
+          end
+          if reaper.ImGui_MenuItem(ctx, "Move...") then
+            state.move_pin_id = pin.pin_id
+            state.move_pin_target_tag_id = pin.tag_id or ""
+            state.move_pin_new_tag = ""
+            state.move_pin_open = true
           end
           if reaper.ImGui_MenuItem(ctx, "Delete") then
             remove_pin_id = pin.pin_id
@@ -1497,6 +1611,10 @@ local function draw_pins()
   if state.rename_tag_open then
     reaper.ImGui_OpenPopup(ctx, "Rename Tag")
     state.rename_tag_open = false
+  end
+  if state.move_pin_open then
+    reaper.ImGui_OpenPopup(ctx, "Move Pin")
+    state.move_pin_open = false
   end
 
   reaper.ImGui_SetNextWindowSize(ctx, 320, 140, reaper.ImGui_Cond_Appearing())
@@ -1566,6 +1684,85 @@ local function draw_pins()
     end
     reaper.ImGui_EndPopup(ctx)
   end
+
+  reaper.ImGui_SetNextWindowSize(ctx, 360, 150, reaper.ImGui_Cond_Appearing())
+  if reaper.ImGui_BeginPopupModal(ctx, "Move Pin", true) then
+    if state.move_pin_target_tag_id == "" then
+      state.move_pin_target_tag_id = default_tag_id
+    end
+    local current_name = "Select..."
+    for _, tag in ipairs(tags) do
+      if tag.tag_id == state.move_pin_target_tag_id then
+        current_name = tag.name
+        break
+      end
+    end
+    if reaper.ImGui_BeginCombo(ctx, "Target Tag", current_name) then
+      for _, tag in ipairs(tags) do
+        local selected = tag.tag_id == state.move_pin_target_tag_id
+        if reaper.ImGui_Selectable(ctx, tag.name, selected) then
+          state.move_pin_target_tag_id = tag.tag_id
+        end
+      end
+      reaper.ImGui_EndCombo(ctx)
+    end
+
+    reaper.ImGui_Dummy(ctx, 0, 6)
+    local btn_h = 28
+    if reaper.ImGui_Button(ctx, "Move", 80, btn_h) then
+      if state.move_pin_id and state.move_pin_target_tag_id ~= "" then
+        for _, pin in ipairs(pins) do
+          if pin.pin_id == state.move_pin_id then
+            pin.tag_id = state.move_pin_target_tag_id
+            set_dirty(true)
+            break
+          end
+        end
+        state.selected_tag_id = state.move_pin_target_tag_id
+        common.SetExtState("selected_tag_id", state.selected_tag_id)
+      end
+      state.move_pin_id = nil
+      reaper.ImGui_CloseCurrentPopup(ctx)
+    end
+    reaper.ImGui_SameLine(ctx)
+    if reaper.ImGui_Button(ctx, "NewTag", 80, btn_h) then
+      local base = "NewTag"
+      local name = base
+      local idx = 0
+      local exists = true
+      while exists do
+        exists = false
+        for _, tag in ipairs(tags) do
+          if tag.name == name then
+            exists = true
+            break
+          end
+        end
+        if exists then
+          idx = idx + 1
+          name = base .. tostring(idx)
+        end
+      end
+      local tag_id = "tag_" .. common.GenerateId()
+      tags[#tags + 1] = { tag_id = tag_id, name = name, order = #tags + 1 }
+      if state.move_pin_id then
+        for _, pin in ipairs(pins) do
+          if pin.pin_id == state.move_pin_id then
+            pin.tag_id = tag_id
+            break
+          end
+        end
+        state.selected_tag_id = tag_id
+        common.SetExtState("selected_tag_id", state.selected_tag_id)
+      end
+      set_dirty(true)
+      state.move_pin_id = nil
+      state.move_pin_target_tag_id = ""
+      state.move_pin_new_tag = ""
+      reaper.ImGui_CloseCurrentPopup(ctx)
+    end
+    reaper.ImGui_EndPopup(ctx)
+  end
 end
 
 local function draw_header()
@@ -1577,6 +1774,21 @@ local function draw_header()
     changed, state.search_text = reaper.ImGui_InputText(ctx, "##search", state.search_text)
   end
   reaper.ImGui_PopItemWidth(ctx)
+  local filter, _ = parse_search_filter(state.search_text)
+  state.search_filter = filter
+  if filter then
+    local label = filter == "ITEM" and "Item" or "Track"
+    local min_x, min_y = reaper.ImGui_GetItemRectMin(ctx)
+    local max_x, max_y = reaper.ImGui_GetItemRectMax(ctx)
+    local text_w, text_h = reaper.ImGui_CalcTextSize(ctx, label)
+    local badge_h = math.max(12, math.min(text_h + 6, (max_y - min_y) - 6))
+    local badge_w = text_w + 10
+    local badge_x = max_x - badge_w - 6
+    local badge_y = min_y + ((max_y - min_y) - badge_h) * 0.5
+    local draw_list = reaper.ImGui_GetWindowDrawList(ctx)
+    reaper.ImGui_DrawList_AddRectFilled(draw_list, badge_x, badge_y, badge_x + badge_w, badge_y + badge_h, COLORS.teal, 4)
+    reaper.ImGui_DrawList_AddText(draw_list, badge_x + (badge_w - text_w) * 0.5, badge_y + (badge_h - text_h) * 0.5, COLORS.text_dark, label)
+  end
   if changed then
     state.search_dirty = true
     state.last_search_change = reaper.time_precise()
