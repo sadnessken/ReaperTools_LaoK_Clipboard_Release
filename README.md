@@ -1,10 +1,20 @@
-# LaoK Clipboard 用户操作手册（V0.11）
+# LaoK Clipboard 用户操作手册（V0.12）
 简单好用的Reaper夸工程搜索与常驻复制粘贴工具！！！
 使用说明：直接在Reapack订阅https://raw.githubusercontent.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/master/index.xml
 之后安装LaoK_Clipboard即可
 请务必按照初次使用教程设置
 
-本手册面向首次使用和日常使用两类场景，包含完整的安装、设置与操作流程。
+v0.12新增功能：
+— 支持Pin迁移至其他Tag的操作
+  - 右键pin会多出move选项，选择后会有二级窗口
+- 搜索栏增加悬浮显示，长名友好
+- PC字体调优
+- 搜索栏结果选中，Reaper最大高亮为1，不会出现复选情况
+- 新增搜索过滤快捷指令：
+  - `-i `：仅搜索 Item（输入 `-i` 后加空格即可进入该模式）
+  - `-t `：仅搜索 Track（输入 `-t` 后加空格即可进入该模式）
+  - 进入对应模式成功后，搜索栏中最右边会有图形显示
+  - 
 
 ## 依赖与文件清单
 
@@ -45,7 +55,7 @@
 4. 选择一个你喜欢的图标并确认
 5. 该按钮用于显示/隐藏主窗口（脚本常驻时再次点击会切换显示）
 
-### 4) 为 Pin / Paste 设置快捷键（推荐）【强烈建议给顺手快捷键shift+C/V很舒适！】
+### 4) 为 Pin / Paste 设置快捷键（推荐）【强烈建议快捷键shift+C/V，体验很舒适！】
 1. 打开 Action List
 2. 搜索并选中：
    - `Script: LaoK_Clipboard_Action_Pin.lua`
