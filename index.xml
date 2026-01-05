@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="LaoK Clipboard" commit="a9a4991583ef5b073b923011e27210bc872f80a5">
+<index version="1" name="LaoK Clipboard" commit="3d8655549d36dd2223139164377ae9fcca5fafdd">
   <category name="Tools">
     <reapack name="LaoK_Clipboard_Main.lua" type="script" desc="LaoK Clipboard (Main + Actions)">
       <metadata>
@@ -19,6 +19,14 @@
         <source main="main" file="LaoK_Clipboard_Toolbar_Toggle.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/a9a4991583ef5b073b923011e27210bc872f80a5/Tools/LaoK_Clipboard_Toolbar_Toggle.lua</source>
         <source file="LaoK_Clipboard_Shared.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/a9a4991583ef5b073b923011e27210bc872f80a5/Tools/LaoK_Clipboard_Shared.lua</source>
       </version>
+      <version name="0.1.1" author="sadnessken" time="2026-01-05T07:54:11Z">
+        <changelog><![CDATA[+ Initial release]]></changelog>
+        <source main="main">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/3d8655549d36dd2223139164377ae9fcca5fafdd/Tools/LaoK_Clipboard_Main.lua</source>
+        <source main="main" file="LaoK_Clipboard_Action_Pin.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/3d8655549d36dd2223139164377ae9fcca5fafdd/Tools/LaoK_Clipboard_Action_Pin.lua</source>
+        <source main="main" file="LaoK_Clipboard_Action_Paste.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/3d8655549d36dd2223139164377ae9fcca5fafdd/Tools/LaoK_Clipboard_Action_Paste.lua</source>
+        <source main="main" file="LaoK_Clipboard_Toolbar_Toggle.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/3d8655549d36dd2223139164377ae9fcca5fafdd/Tools/LaoK_Clipboard_Toolbar_Toggle.lua</source>
+        <source file="LaoK_Clipboard_Shared.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/3d8655549d36dd2223139164377ae9fcca5fafdd/Tools/LaoK_Clipboard_Shared.lua</source>
+      </version>
     </reapack>
   </category>
   <metadata>
@@ -26,14 +34,15 @@
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 LaoK Clipboard \u29992 ?\u25143 ?\u25805 ?\u20316 ?\u25163 ?\u20876 ?\u65288 ?V0.1\u65289 ?\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 LaoK Clipboard \u29992 ?\u25143 ?\u25805 ?\u20316 ?\u25163 ?\u20876 ?\u65288 ?V0.11\u65289 ?\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \u31616 ?\u21333 ?\u22909 ?\u29992 ?\u30340 ?Reaper\u22840 ?\u24037 ?\u31243 ?\u25628 ?\u32034 ?\u19982 ?\u24120 ?\u39547 ?\u22797 ?\u21046 ?\u31896 ?\u36148 ?\u24037 ?\u20855 ?\u65281 ?\u65281 ?\u65281 ? \u20351 ?\u29992 ?\u35828 ?\u26126 ?\u65306 ?\u30452 ?\u25509 ?\u22312 ?Reapack\u35746 ?\u38405 ?https://raw.githubusercontent.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/master/index.xml \u20043 ?\u21518 ?\u23433 ?\u35013 ?LaoK_Clipboard\u21363 ?\u21487 ? \u35831 ?\u21153 ?\u24517 ?\u25353 ?\u29031 ?\u21021 ?\u27425 ?\u20351 ?\u29992 ?\u25945 ?\u31243 ?\u35774 ?\u32622 ?\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \u26412 ?\u25163 ?\u20876 ?\u38754 ?\u21521 ?\u39318 ?\u27425 ?\u20351 ?\u29992 ?\u21644 ?\u26085 ?\u24120 ?\u20351 ?\u29992 ?\u20004 ?\u31867 ?\u22330 ?\u26223 ?\u65292 ?\u21253 ?\u21547 ?\u23436 ?\u25972 ?\u30340 ?\u23433 ?\u35013 ?\u12289 ?\u35774 ?\u32622 ?\u19982 ?\u25805 ?\u20316 ?\u27969 ?\u31243 ?\u12290 ?\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u20381 ?\u36182 ?\u19982 ?\u25991 ?\u20214 ?\u28165 ?\u21333 ?\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u20381 ?\u36182 ?\u65306 ?\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab REAPER 7.x\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab SWS Extension\u65288 ?\u29992 ?\u20110 ?\u20840 ?\u23616 ?\u21551 ?\u21160 ?\u65289 ?\par}
-{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab ReaImGui\u65288 ?\u30028 ?\u38754 ?\u25152 ?\u38656 ?\u65289 ?\sa180\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab ReaImGui\u65288 ?\u30028 ?\u38754 ?\u25152 ?\u38656 ?\u65289 ?\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab JS_ReaScriptAPI\sa180\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u33050 ?\u26412 ?\u28165 ?\u21333 ?\u65306 ?\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Main.lua}\u65288 ?\u20027 ?\u30028 ?\u38754 ?\u65289 ?\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab {\f1 LaoK_Clipboard_Action_Pin.lua}\u65288 ?Pin\u65289 ?\par}
