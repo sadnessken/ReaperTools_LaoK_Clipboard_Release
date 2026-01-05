@@ -1,4 +1,4 @@
-# LaoK Clipboard 用户操作手册（V0.1）
+# LaoK Clipboard 用户操作手册（V0.11）
 简单好用的Reaper夸工程搜索与常驻复制粘贴工具！！！
 使用说明：直接在Reapack订阅https://raw.githubusercontent.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/master/index.xml
 之后安装LaoK_Clipboard即可
@@ -12,6 +12,7 @@
   - REAPER 7.x
   - SWS Extension（用于全局启动）
   - ReaImGui（界面所需）
+  - JS_ReaScriptAPI
 - 脚本清单：
   - `LaoK_Clipboard_Main.lua`（主界面）
   - `LaoK_Clipboard_Action_Pin.lua`（Pin）
