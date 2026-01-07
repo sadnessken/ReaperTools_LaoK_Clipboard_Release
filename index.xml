@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="LaoK Clipboard" commit="bb57055f9cbd339fecc38d9e7e7a675a0f990e8e">
+<index version="1" name="LaoK Clipboard" commit="c0b13a0319864b75c946ebd05ff1eb32ab4d4d97">
   <category name="Tools">
     <reapack name="LaoK_Clipboard_Main.lua" type="script" desc="LaoK Clipboard (Main + Actions)">
       <metadata>
@@ -58,6 +58,21 @@
         <source file="LaoK_Clipboard_UserData.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/bb57055f9cbd339fecc38d9e7e7a675a0f990e8e/Tools/LaoK_Clipboard_UserData.lua</source>
         <source file="LaoK_Clipboard_Window.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/bb57055f9cbd339fecc38d9e7e7a675a0f990e8e/Tools/LaoK_Clipboard_Window.lua</source>
       </version>
+      <version name="0.1.3.1" author="sadnessken" time="2026-01-07T14:42:28Z">
+        <changelog><![CDATA[+ Initial release]]></changelog>
+        <source main="main">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_Main.lua</source>
+        <source main="main" file="LaoK_Clipboard_Action_Pin.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_Action_Pin.lua</source>
+        <source main="main" file="LaoK_Clipboard_Action_Paste.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_Action_Paste.lua</source>
+        <source main="main" file="LaoK_Clipboard_Toolbar_Toggle.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_Toolbar_Toggle.lua</source>
+        <source file="LaoK_Clipboard_Shared.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_Shared.lua</source>
+        <source file="LaoK_Clipboard_Indexer.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_Indexer.lua</source>
+        <source file="LaoK_Clipboard_State.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_State.lua</source>
+        <source file="LaoK_Clipboard_UI_Pins.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_UI_Pins.lua</source>
+        <source file="LaoK_Clipboard_UI_Search.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_UI_Search.lua</source>
+        <source file="LaoK_Clipboard_UI_Style.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_UI_Style.lua</source>
+        <source file="LaoK_Clipboard_UserData.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_UserData.lua</source>
+        <source file="LaoK_Clipboard_Window.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/c0b13a0319864b75c946ebd05ff1eb32ab4d4d97/Tools/LaoK_Clipboard_Window.lua</source>
+      </version>
     </reapack>
   </category>
   <metadata>
@@ -79,7 +94,10 @@
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab \u36827 ?\u20837 ?\u23545 ?\u24212 ?\u27169 ?\u24335 ?\u25104 ?\u21151 ?\u21518 ?\u65292 ?\u25628 ?\u32034 ?\u26639 ?\u20013 ?\u26368 ?\u21491 ?\u36793 ?\u20250 ?\u26377 ?\u22270 ?\u24418 ?\u26174 ?\u31034 ?\sa180\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 v0.13\u26032 ?\u22686 ?\u21151 ?\u33021 ?\u65306 ?\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u20248 ?\u21270 ?\u20195 ?\u30721 ?\u32467 ?\u26500 ?\u65292 ?\u25552 ?\u39640 ?\u36816 ?\u34892 ?\u25928 ?\u29575 ?\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u25353 ?\u38062 ?\u28155 ?\u21152 ?\u24038 ?\u19978 ?\u35282 ?\u22278 ?\u24418 ?\u35282 ?\u26631 ?\u65292 ?T\u34920 ?\u31034 ?Track\u65292 ?I\u34920 ?\u31034 ?Item\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u25353 ?\u38062 ?\u28155 ?\u21152 ?\u24038 ?\u19978 ?\u35282 ?\u22278 ?\u24418 ?\u35282 ?\u26631 ?\u65292 ?T\u34920 ?\u31034 ?Track\u65292 ?I\u34920 ?\u31034 ?Item\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u25628 ?\u32034 ?\u27169 ?\u24335 ?\u26032 ?\u22686 ? {\f1 -r } / {\f1 -m }\u65288 ?Region/Marker\u65289 ?\u24182 ?\u26174 ?\u31034 ?\u23545 ?\u24212 ?\u24509 ?\u26631 ?\u12290 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u32654 ?\u21270 ?\u24067 ?\u23616 ?\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u38480 ?\u21046 ?Pin\u19982 ?Tag\u25353 ?\u38062 ?\u26368 ?\u22823 ?\u25991 ?\u26412 ?\u38271 ?\u24230 ?\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u20381 ?\u36182 ?\u19982 ?\u25991 ?\u20214 ?\u28165 ?\u21333 ?\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u20381 ?\u36182 ?\u65306 ?\par}
 {\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab REAPER 7.x\par}
