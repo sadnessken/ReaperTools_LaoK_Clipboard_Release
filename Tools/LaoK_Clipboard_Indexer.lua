@@ -266,6 +266,12 @@ function M.ParseSearchFilter(text)
   elseif raw_lower:sub(1, 3) == "-t " then
     filter = "TRACK"
     raw = raw:sub(4)
+  elseif raw_lower:sub(1, 3) == "-r " then
+    filter = "REGION"
+    raw = raw:sub(4)
+  elseif raw_lower:sub(1, 3) == "-m " then
+    filter = "MARKER"
+    raw = raw:sub(4)
   end
   return filter, raw
 end

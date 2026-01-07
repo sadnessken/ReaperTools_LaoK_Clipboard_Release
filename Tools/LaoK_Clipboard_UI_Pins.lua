@@ -13,27 +13,31 @@ end
 
 local function compute_pins_layout(tags, pins_count)
   local tag_btn_h = 26
+  local tag_spacing = 6
   local tag_rows = math.max(2, math.min(#tags + 1, 5))
-  local tag_child_h = tag_rows * (tag_btn_h + 6) + 6
+  local tag_row_h = tag_btn_h + tag_spacing
+  local tag_child_h = tag_rows * tag_row_h + 6
 
-  local spacing = 8
-  local grid_btn_h = 40
+  local spacing_x = 8
+  local spacing_y = 6
+  local grid_btn_h = math.max(24, (5 * tag_row_h) / 3 - spacing_y)
   local pin_btn_w = 200
-  local cols = math.min(math.max(pins_count, 1), 5)
-  local pin_rows = math.min(math.max(math.ceil(pins_count / cols), 1), 5)
-  local grid_h = pin_rows * (grid_btn_h + spacing) + 6
+  local cols = math.min(math.max(pins_count, 1), 3)
+  local pin_rows = math.max(math.ceil(pins_count / cols), 1)
+  local visible_rows = math.min(pin_rows, 3)
+  local grid_h = visible_rows * (grid_btn_h + spacing_y) + 6
   local pins_area_h = math.max(tag_child_h, grid_h)
-  local grid_w = cols * pin_btn_w + (cols - 1) * spacing
+  local grid_w = cols * pin_btn_w + (cols - 1) * spacing_x
   local tag_w = 80
   local min_cols = 2
-  local min_grid_w = min_cols * pin_btn_w + (min_cols - 1) * spacing
-  local pins_area_w = tag_w + spacing + math.max(grid_w, min_grid_w)
+  local min_grid_w = min_cols * pin_btn_w + (min_cols - 1) * spacing_x
+  local pins_area_w = tag_w + spacing_x + math.max(grid_w, min_grid_w)
 
   return {
     tag_w = tag_w,
     tag_btn_h = tag_btn_h,
     tag_child_h = tag_child_h,
-    spacing = spacing,
+    spacing = spacing_x,
     grid_btn_h = grid_btn_h,
     grid_h = grid_h,
     pin_btn_w = pin_btn_w,
@@ -58,6 +62,8 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
   local tags = state.user_data.tags or {}
   local pins = state.user_data.pins or {}
   local default_tag_id = layout.default_tag_id or "default"
+  local max_pin_label_len = #"0123456789012.wav"
+  local max_tag_label_len = #"sixsixsix"
 
   local tag_w = layout.tag_w
   local tag_btn_h = layout.tag_btn_h
@@ -83,7 +89,11 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
       else
         pop_colors = style.PushButtonColors(ctx, style.Colors.tag_idle, style.Colors.tag_hover, style.Colors.tag_active)
       end
-      if style.ButtonCentered(ctx, tag.name, "tag_btn_" .. tag.tag_id, -1, tag_btn_h, text_color) then
+      local tag_label = tag.name or ""
+      if #tag_label > max_tag_label_len then
+        tag_label = tag_label:sub(1, max_tag_label_len)
+      end
+      if style.ButtonCentered(ctx, tag_label, "tag_btn_" .. tag.tag_id, -1, tag_btn_h, text_color) then
         state.selected_tag_id = tag.tag_id
         common.SetExtState("selected_tag_id", state.selected_tag_id)
       end
@@ -150,7 +160,11 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
         else
           pop_colors = style.PushButtonColors(ctx, style.Colors.pin_idle, style.Colors.pin_hover, style.Colors.pin_active)
         end
-        if style.ButtonCentered(ctx, pin.pin_name, "pin_btn_" .. pin.pin_id, btn_w, grid_btn_h, text_color) then
+        local pin_label = pin.pin_name or ""
+        if #pin_label > max_pin_label_len then
+          pin_label = pin_label:sub(1, max_pin_label_len)
+        end
+        if style.ButtonCentered(ctx, pin_label, "pin_btn_" .. pin.pin_id, btn_w, grid_btn_h, text_color) then
           state.selected_pin_id = pin.pin_id
           common.SetExtState("selected_pin_id", state.selected_pin_id)
         end
@@ -239,9 +253,17 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
   if reaper.ImGui_BeginPopupModal(ctx, "Add Tag", true) then
     local changed
     changed, state.add_tag_text = reaper.ImGui_InputText(ctx, "Name", state.add_tag_text)
+    local name = common.Trim(state.add_tag_text or "")
+    local too_long = #name > max_tag_label_len
+    if too_long then
+      if reaper.ImGui_TextColored then
+        reaper.ImGui_TextColored(ctx, style.Colors.text_soft, "文本过长，不能保存")
+      else
+        reaper.ImGui_Text(ctx, "文本过长，不能保存")
+      end
+    end
     if style.ButtonCentered(ctx, "Create", "add_tag_create", 110, 30, style.Colors.text_dark) then
-      local name = common.Trim(state.add_tag_text)
-      if name ~= "" then
+      if name ~= "" and not too_long then
         local tag_id = "tag_" .. common.GenerateId()
         tags[#tags + 1] = { tag_id = tag_id, name = name, order = #tags + 1 }
         state.selected_tag_id = tag_id
@@ -250,7 +272,9 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
           state._set_dirty(true)
         end
       end
-      reaper.ImGui_CloseCurrentPopup(ctx)
+      if not too_long then
+        reaper.ImGui_CloseCurrentPopup(ctx)
+      end
     end
     reaper.ImGui_SameLine(ctx)
     if style.ButtonCentered(ctx, "Cancel", "add_tag_cancel", 110, 30, style.Colors.text_dark) then
@@ -284,22 +308,33 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
     reaper.ImGui_EndPopup(ctx)
   end
 
-  reaper.ImGui_SetNextWindowSize(ctx, 320, 150, reaper.ImGui_Cond_FirstUseEver())
+  reaper.ImGui_SetNextWindowSize(ctx, 360, 150, reaper.ImGui_Cond_FirstUseEver())
   if reaper.ImGui_BeginPopupModal(ctx, "Rename Tag", true) then
     local changed
     changed, state.rename_tag_text = reaper.ImGui_InputText(ctx, "Name", state.rename_tag_text)
-    if style.ButtonCentered(ctx, "OK", "rename_tag_ok", 110, 30, style.Colors.text_dark) then
-      for _, tag in ipairs(tags) do
-        if tag.tag_id == state.rename_tag_id then
-          tag.name = state.rename_tag_text
-          if state._set_dirty then
-            state._set_dirty(true)
-          end
-          break
-        end
+    local trimmed = common.Trim(state.rename_tag_text or "")
+    local too_long = #trimmed > max_tag_label_len
+    if too_long then
+      if reaper.ImGui_TextColored then
+        reaper.ImGui_TextColored(ctx, style.Colors.text_soft, "文本过长，不能保存")
+      else
+        reaper.ImGui_Text(ctx, "文本过长，不能保存")
       end
-      state.rename_tag_id = nil
-      reaper.ImGui_CloseCurrentPopup(ctx)
+    end
+    if style.ButtonCentered(ctx, "OK", "rename_tag_ok", 110, 30, style.Colors.text_dark) then
+      if not too_long then
+        for _, tag in ipairs(tags) do
+          if tag.tag_id == state.rename_tag_id then
+            tag.name = trimmed
+            if state._set_dirty then
+              state._set_dirty(true)
+            end
+            break
+          end
+        end
+        state.rename_tag_id = nil
+        reaper.ImGui_CloseCurrentPopup(ctx)
+      end
     end
     reaper.ImGui_SameLine(ctx)
     if style.ButtonCentered(ctx, "Cancel", "rename_tag_cancel", 110, 30, style.Colors.text_dark) then

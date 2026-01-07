@@ -185,7 +185,9 @@ local function capture_selected_items()
 end
 
 local function restore_selected_items(items)
-  reaper.Main_OnCommand(40297, 0)
+  if reaper.SelectAllMediaItems then
+    reaper.SelectAllMediaItems(0, false)
+  end
   for _, item in ipairs(items) do
     reaper.SetMediaItemSelected(item, true)
   end
@@ -194,7 +196,9 @@ end
 local function build_peaks_for_items(items)
   if #items == 0 then return end
   local prev = capture_selected_items()
-  reaper.Main_OnCommand(40297, 0)
+  if reaper.SelectAllMediaItems then
+    reaper.SelectAllMediaItems(0, false)
+  end
   for _, item in ipairs(items) do
     reaper.SetMediaItemSelected(item, true)
   end

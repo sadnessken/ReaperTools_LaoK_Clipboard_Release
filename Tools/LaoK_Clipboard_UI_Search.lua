@@ -12,22 +12,18 @@ end
 
 local function select_track(track)
   if not track then return end
-  reaper.Main_OnCommand(40297, 0)
-  reaper.Main_OnCommand(40296, 0)
+  if reaper.SelectAllMediaItems then
+    reaper.SelectAllMediaItems(0, false)
+  end
   reaper.SetOnlyTrackSelected(track)
   reaper.Main_OnCommand(40913, 0)
 end
 
 local function select_item(item)
   if not item then return end
-  local sel_count = reaper.CountSelectedMediaItems(0)
-  for i = sel_count - 1, 0, -1 do
-    local sel = reaper.GetSelectedMediaItem(0, i)
-    if sel then
-      reaper.SetMediaItemSelected(sel, false)
-    end
+  if reaper.SelectAllMediaItems then
+    reaper.SelectAllMediaItems(0, false)
   end
-  reaper.Main_OnCommand(40296, 0)
   local track = reaper.GetMediaItemTrack(item)
   if track then
     reaper.SetOnlyTrackSelected(track)
@@ -172,7 +168,16 @@ function M.DrawSearchArea(ctx, common, state, style, indexer)
   state.search_query = raw or ""
 
   if filter then
-    local label = filter == "ITEM" and "Item" or "Track"
+    local label = filter
+    if filter == "ITEM" then
+      label = "Item"
+    elseif filter == "TRACK" then
+      label = "Track"
+    elseif filter == "REGION" then
+      label = "Region"
+    elseif filter == "MARKER" then
+      label = "Marker"
+    end
     local min_x, min_y = reaper.ImGui_GetItemRectMin(ctx)
     local max_x, max_y = reaper.ImGui_GetItemRectMax(ctx)
     local text_w, text_h = reaper.ImGui_CalcTextSize(ctx, label)

@@ -387,7 +387,7 @@ function M.JsonDecode(str)
     return decode_error(idx, "unterminated object")
   end
 
-  function parse_value()
+  parse_value = function()
     skip_ws()
     if idx > len then return decode_error(idx, "unexpected end") end
     local c = str:sub(idx, idx)
