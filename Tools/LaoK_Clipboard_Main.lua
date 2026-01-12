@@ -1,5 +1,5 @@
 -- @description LaoK Clipboard (Main + Actions)
--- @version 0.1.3.2
+-- @version 0.1.3.3
 -- @author sadnessken
 -- @about
 --   LaoK_Clipboard：REAPER 常驻窗口工具（Pin/Paste/Toolbar Toggle 等脚本打包安装）。
@@ -198,8 +198,8 @@ local function loop()
       frame_h = reaper.ImGui_GetFrameHeight(ctx)
     end
     local dropdown_h = UISearch.GetDropdownHeight(common, state)
-    local desired_h = Style.GetTitleBarHeight() + 12 + frame_h + dropdown_h + 8 + layout.pins_area_h + 8 + 10
-    local desired_w = 12 + layout.pins_area_w + 12
+    local desired_h = Style.GetTitleBarHeight() + 16 + frame_h + dropdown_h + 10 + layout.pins_area_h + 8 + 5
+    local desired_w = 12 + layout.pins_area_w + 30
     reaper.ImGui_SetNextWindowSize(ctx, desired_w, desired_h, reaper.ImGui_Cond_Always())
     local flags = reaper.ImGui_WindowFlags_NoTitleBar() |
       reaper.ImGui_WindowFlags_NoResize() |

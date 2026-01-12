@@ -16,20 +16,20 @@ local function compute_pins_layout(tags, pins_count)
   local tag_spacing = 6
   local tag_rows = math.max(2, math.min(#tags + 1, 5))
   local tag_row_h = tag_btn_h + tag_spacing
-  local tag_child_h = tag_rows * tag_row_h + 6
+  local tag_child_h = math.max(0, tag_rows * tag_row_h - 5)
 
   local spacing_x = 8
   local spacing_y = 6
   local grid_btn_h = math.max(24, (5 * tag_row_h) / 3 - spacing_y)
-  local pin_btn_w = 200
+  local pin_btn_w = 180
   local cols = math.min(math.max(pins_count, 1), 3)
   local pin_rows = math.max(math.ceil(pins_count / cols), 1)
   local visible_rows = math.min(pin_rows, 3)
-  local grid_h = visible_rows * (grid_btn_h + spacing_y) + 6
+  local grid_h = math.max(0, visible_rows * (grid_btn_h + spacing_y) - 5)
   local pins_area_h = math.max(tag_child_h, grid_h)
   local grid_w = cols * pin_btn_w + (cols - 1) * spacing_x
-  local tag_w = 80
-  local min_cols = 2
+  local tag_w = 120
+  local min_cols = 3
   local min_grid_w = min_cols * pin_btn_w + (min_cols - 1) * spacing_x
   local pins_area_w = tag_w + spacing_x + math.max(grid_w, min_grid_w)
 
@@ -63,8 +63,8 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
   local tags = state.user_data.tags or {}
   local pins = state.user_data.pins or {}
   local default_tag_id = layout.default_tag_id or "default"
-  local max_pin_label_len = #"0123456789012.wav"
-  local max_tag_label_len = #"sixsixsix"
+  local max_pin_label_len = #"0123456789012"
+  local max_tag_label_len = #"everything"
 
   local tag_w = layout.tag_w
   local tag_btn_h = layout.tag_btn_h
