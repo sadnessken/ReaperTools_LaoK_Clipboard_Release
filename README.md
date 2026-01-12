@@ -1,5 +1,5 @@
-# LaoK Clipboard 用户操作手册（V0.13）
-简单好用的Reaper夸工程搜索与常驻复制粘贴工具！！！
+# LaoK Clipboard 用户操作手册（V0.132）
+简单好用的Reaper跨工程搜索与常驻复制粘贴工具！！！
 使用说明：直接在Reapack订阅https://raw.githubusercontent.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/master/index.xml
 之后安装LaoK_Clipboard即可
 请务必按照初次使用教程设置
@@ -21,6 +21,8 @@ v0.13新增功能：
 - 搜索模式新增 `-r ` / `-m `（Region/Marker）并显示对应徽标。
 - 美化布局
 - 限制Pin与Tag按钮最大文本长度
+- 解决部分平台及分辨率下报错的问题
+
 ## 依赖与文件清单
 
 - 依赖：
@@ -40,18 +42,18 @@ v0.13新增功能：
 ### 1) 导入脚本到 Action List（如果订阅Repack可忽略）
 1. 打开 REAPER：`Actions -> Show action list...`
 2. 点击 `ReaScript: Load...`
-3. 依次选择并加载所有脚本（不再枚举）：
+3. 加载以下脚本：
    - `LaoK_Clipboard_Main.lua`
    - `LaoK_Clipboard_Action_Pin.lua`
    - `LaoK_Clipboard_Action_Paste.lua`
    - `LaoK_Clipboard_Toolbar_Toggle.lua`
-   - `LaoK_Clipboard_Shared.lua`
 
 ### 2) 设置 Main 为全局启动（SWS）【必做！】
 1. 菜单进入：`Extensions -> Startup actions -> Set global startup actions...`
 2. 点击 `Add`
 3. 在 Action 列表中找到 `Script: LaoK_Clipboard_Main.lua`，添加并确认
 4. 以后 REAPER 启动时 Main 会自动常驻运行
+5. 也可以使用__starup.lua实现全局启动，这里不再赘述，请自行搜索
 
 ### 3) 主工具栏添加图标（MainBar）
 1. 右键主工具栏空白处 -> `Customize toolbar...`
