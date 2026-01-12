@@ -1,5 +1,5 @@
 -- @description LaoK Clipboard (Main + Actions)
--- @version 0.1.3.1
+-- @version 0.1.3.2
 -- @author sadnessken
 -- @about
 --   LaoK_Clipboard：REAPER 常驻窗口工具（Pin/Paste/Toolbar Toggle 等脚本打包安装）。
