@@ -212,7 +212,7 @@ end
 function M.DrawUserSetup(ctx, common, state, style)
   if not state.needs_user_setup then return end
   style.PushStyle(ctx)
-  reaper.ImGui_SetNextWindowSize(ctx, 420, 170, reaper.ImGui_Cond_FirstUseEver())
+  reaper.ImGui_SetNextWindowSize(ctx, 480, 200, reaper.ImGui_Cond_FirstUseEver())
   local flags = reaper.ImGui_WindowFlags_NoTitleBar() |
     reaper.ImGui_WindowFlags_NoResize() |
     reaper.ImGui_WindowFlags_NoCollapse() |
@@ -225,7 +225,11 @@ function M.DrawUserSetup(ctx, common, state, style)
   if visible then
     local title_h = style.DrawSettingsTitleBar(ctx, "User Data Setup", false)
     reaper.ImGui_SetCursorPos(ctx, 12, title_h + 12)
-    reaper.ImGui_Text(ctx, "未找到用户数据，请先设定用户信息。")
+    if reaper.ImGui_TextWrapped then
+      reaper.ImGui_TextWrapped(ctx, "未找到用户数据，请先设定用户信息。")
+    else
+      reaper.ImGui_Text(ctx, "未找到用户数据，请先设定用户信息。")
+    end
     reaper.ImGui_Dummy(ctx, 0, 12)
     local avail_w = reaper.ImGui_GetContentRegionAvail(ctx)
     local gap = 10
@@ -248,7 +252,7 @@ function M.DrawUserNamePrompt(ctx, common, state, style)
     reaper.ImGui_OpenPopup(ctx, "UserNamePrompt")
     state.user_name_prompt_open = false
   end
-  reaper.ImGui_SetNextWindowSize(ctx, 320, 170, reaper.ImGui_Cond_FirstUseEver())
+  reaper.ImGui_SetNextWindowSize(ctx, 320, 150, reaper.ImGui_Cond_FirstUseEver())
   local popup_flags = 0
   if reaper.ImGui_WindowFlags_NoDocking then
     popup_flags = popup_flags | reaper.ImGui_WindowFlags_NoDocking()

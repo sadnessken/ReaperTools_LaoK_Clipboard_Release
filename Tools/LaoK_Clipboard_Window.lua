@@ -1,27 +1,51 @@
 -- @noindex
 local M = {}
 
+local function get_main_window_rect()
+  if not (reaper.GetMainHwnd and reaper.JS_Window_GetRect) then return nil end
+  local hwnd = reaper.GetMainHwnd()
+  if not hwnd then return nil end
+
+  local ok, v1, v2, v3, v4, v5 = pcall(reaper.JS_Window_GetRect, hwnd)
+  if not ok then return nil end
+
+  local l, t, r, b
+  if type(v1) == "boolean" then
+    if not v1 then return nil end
+    l, t, r, b = v2, v3, v4, v5
+  else
+    l, t, r, b = v1, v2, v3, v4
+  end
+
+  if type(l) ~= "number" or type(t) ~= "number" or type(r) ~= "number" or type(b) ~= "number" then
+    return nil
+  end
+
+  return l, t, r, b
+end
+
 local function clamp_to_viewport(x, y, w, h)
   if not x or not y or not w or not h then return x, y end
-  if not reaper.my_getViewport then return x, y end
-  local ok, v1, v2, v3, v4, v5 =
-  pcall(reaper.my_getViewport, 0, 0, 0, 0, x, y, x + w, y + h, true)
-if not ok then return x, y end
 
-local l, t, r, b
-if type(v1) == "boolean" then
-  -- 某些环境返回：retval, l, t, r, b
-  if not v1 then return x, y end
-  l, t, r, b = v2, v3, v4, v5
-else
-  -- 常规返回：l, t, r, b
-  l, t, r, b = v1, v2, v3, v4
-end
+  local l, t, r, b
+  if reaper.my_getViewport then
+    local ok, v1, v2, v3, v4, v5 = pcall(reaper.my_getViewport, 0, 0, 0, 0, x, y, x + w, y + h, true)
+    if ok then
+      if type(v1) == "boolean" then
+        if v1 then l, t, r, b = v2, v3, v4, v5 end
+      else
+        l, t, r, b = v1, v2, v3, v4
+      end
+    end
+  end
 
-if type(l) ~= "number" or type(t) ~= "number" or type(r) ~= "number" or type(b) ~= "number" then
-  return x, y
-end
+  if not (l and t and r and b) then
+    l, t, r, b = get_main_window_rect()
+  end
 
+  if not (l and t and r and b) then
+    return x, y
+  end
 
   local pad = 20
   local min_x = l + pad
@@ -42,31 +66,6 @@ end
   end
 
   return x, y
-end
-
-local function get_main_window_rect()
-  if not (reaper.GetMainHwnd and reaper.JS_Window_GetRect) then return nil end
-  local hwnd = reaper.GetMainHwnd()
-  if not hwnd then return nil end
-
-  local ok, v1, v2, v3, v4, v5 = pcall(reaper.JS_Window_GetRect, hwnd)
-  if not ok then return nil end
-
-  local l, t, r, b
-  if type(v1) == "boolean" then
-    -- 某些环境：retval, l, t, r, b
-    if not v1 then return nil end
-    l, t, r, b = v2, v3, v4, v5
-  else
-    -- 常规：l, t, r, b
-    l, t, r, b = v1, v2, v3, v4
-  end
-
-  if type(l) ~= "number" or type(t) ~= "number" or type(r) ~= "number" or type(b) ~= "number" then
-    return nil
-  end
-
-  return l, t, r, b
 end
 
 local function ensure_settings_table(state, common)

@@ -38,6 +38,7 @@ local function compute_pins_layout(tags, pins_count)
     tag_btn_h = tag_btn_h,
     tag_child_h = tag_child_h,
     spacing = spacing_x,
+    spacing_y = spacing_y,
     grid_btn_h = grid_btn_h,
     grid_h = grid_h,
     pin_btn_w = pin_btn_w,
@@ -69,13 +70,23 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
   local tag_btn_h = layout.tag_btn_h
   local tag_child_h = layout.tag_child_h
   local cols = layout.cols
-  local spacing = layout.spacing
+  local spacing_x = layout.spacing
+  local spacing_y = layout.spacing_y or 0
   local grid_btn_h = layout.grid_btn_h
   local grid_h = layout.grid_h
   local pins_area_h = layout.pins_area_h
 
+  local spacing_pushed = false
+  if reaper.ImGui_StyleVar_ItemSpacing then
+    reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_ItemSpacing(), spacing_x, spacing_y)
+    spacing_pushed = true
+  end
+
   local pins_area_ok = style.BeginChild(ctx, "PinsArea", -1, pins_area_h, false)
-  if not pins_area_ok then return end
+  if not pins_area_ok then
+    if spacing_pushed then reaper.ImGui_PopStyleVar(ctx) end
+    return
+  end
 
   reaper.ImGui_BeginGroup(ctx)
   local tag_child_ok = style.BeginChild(ctx, "TagList", tag_w, tag_child_h, true)
@@ -425,6 +436,10 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
       reaper.ImGui_CloseCurrentPopup(ctx)
     end
     reaper.ImGui_EndPopup(ctx)
+  end
+
+  if spacing_pushed then
+    reaper.ImGui_PopStyleVar(ctx)
   end
 end
 
