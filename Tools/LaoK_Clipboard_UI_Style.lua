@@ -209,7 +209,7 @@ function M.DrawTitleBar(ctx)
 
   reaper.ImGui_DrawList_AddRectFilled(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_bg, 0)
   reaper.ImGui_DrawList_AddRect(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_border, 0, 0, 1.2)
-  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.1.3.3")
+  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.1.4.0")
 
   local icon_size = 14
   local pad = 12
@@ -217,6 +217,26 @@ function M.DrawTitleBar(ctx)
   local cy = icon_y + icon_size / 2
   local x_hide = pos_x + width - pad - icon_size
   local x_settings = x_hide - 10 - icon_size
+
+  local drag_w = width - (icon_size * 2 + pad * 2 + 16)
+  if drag_w < 40 then drag_w = 40 end
+  reaper.ImGui_SetCursorScreenPos(ctx, pos_x + 4, pos_y)
+  reaper.ImGui_InvisibleButton(ctx, "##title_drag", drag_w, title_h)
+  if reaper.ImGui_IsItemActive(ctx) and reaper.ImGui_IsMouseDragging(ctx, 0) then
+    local dx, dy = 0, 0
+    if reaper.ImGui_GetMouseDelta then
+      dx, dy = reaper.ImGui_GetMouseDelta(ctx)
+    elseif reaper.ImGui_GetMouseDragDelta then
+      dx, dy = reaper.ImGui_GetMouseDragDelta(ctx, 0)
+      if reaper.ImGui_ResetMouseDragDelta then
+        reaper.ImGui_ResetMouseDragDelta(ctx, 0)
+      end
+    end
+    local wx, wy = reaper.ImGui_GetWindowPos(ctx)
+    if reaper.ImGui_SetWindowPos then
+      reaper.ImGui_SetWindowPos(ctx, wx + dx, wy + dy, reaper.ImGui_Cond_Always())
+    end
+  end
 
   local hovered, clicked = draw_icon_button(ctx, "##hide", x_hide, icon_y, icon_size)
   local color = hovered and COLORS.title_icon_hover or COLORS.title_icon

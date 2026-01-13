@@ -123,8 +123,16 @@ end
 function M.UpdateAndPersistWindowPos(ctx, common, state, desired_w, desired_h, now)
   local wx, wy = reaper.ImGui_GetWindowPos(ctx)
   if wx and wy then
-    local cx, cy = clamp_to_viewport(wx, wy, desired_w, desired_h)
-    if (math.abs(cx - wx) > 1) or (math.abs(cy - wy) > 1) then
+    local ww, wh
+    if reaper.ImGui_GetWindowSize then
+      ww, wh = reaper.ImGui_GetWindowSize(ctx)
+    end
+    local clamp_w = ww or desired_w
+    local clamp_h = wh or desired_h
+    local cx, cy = clamp_to_viewport(wx, wy, clamp_w, clamp_h)
+    local dx = cx - wx
+    local dy = cy - wy
+    if (math.abs(dx) > 10) or (math.abs(dy) > 10) then
       state.win_force_x, state.win_force_y = cx, cy
       state.win_pos_apply = true
     end

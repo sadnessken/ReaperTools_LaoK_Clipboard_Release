@@ -253,11 +253,17 @@ local function paste_items(pin, media_map, missing, created_items)
   local base_track, base_index = get_base_track()
   local base_pin_index = pin.payload.base_track_index or 1
   local edit_pos = reaper.GetCursorPosition()
+  local base_offset = edit_pos
   local skipped = 0
+  local track_map = {}
 
   for _, item in ipairs(pin.payload.items or {}) do
     local dest_track_index = base_index + (item.track_index - base_pin_index)
-    local track = ensure_track_at_index(dest_track_index)
+    local track = track_map[item.track_index]
+    if not track then
+      track = ensure_track_at_index(dest_track_index)
+      track_map[item.track_index] = track
+    end
 
     local replaced, item_missing = common.ReplaceChunkFilePaths(item.chunk, media_map, nil)
     for path_key in pairs(item_missing) do
@@ -265,7 +271,7 @@ local function paste_items(pin, media_map, missing, created_items)
     end
     local new_item = reaper.AddMediaItemToTrack(track)
     reaper.SetItemStateChunk(new_item, replaced, false)
-    local pos = edit_pos + (item.offset or 0)
+    local pos = base_offset + (item.offset or 0)
     reaper.SetMediaItemInfo_Value(new_item, "D_POSITION", pos)
     created_items[#created_items + 1] = new_item
   end
@@ -300,6 +306,13 @@ local function apply_track_sends(pin, new_tracks)
 end
 
 local function paste_tracks(pin, media_map, missing, created_items)
+  local use_absolute = pin.payload and pin.payload.absolute_items
+  local cursor_saved = reaper.GetCursorPosition()
+  local ts_start, ts_end = reaper.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
+  if use_absolute then
+    reaper.SetEditCurPos(0, false, false)
+  end
+
   local count = reaper.CountSelectedTracks(0)
   local insert_index
   if count > 0 then
@@ -325,7 +338,7 @@ local function paste_tracks(pin, media_map, missing, created_items)
   reaper.TrackList_AdjustWindows(false)
   reaper.UpdateArrange()
 
-  local edit_pos = reaper.GetCursorPosition()
+  local edit_pos = use_absolute and 0 or cursor_saved
   local skipped = 0
   for _, it in ipairs(pin.payload.items or {}) do
     local track = new_tracks[it.track_slot]
@@ -336,7 +349,19 @@ local function paste_tracks(pin, media_map, missing, created_items)
       end
       local new_item = reaper.AddMediaItemToTrack(track)
       reaper.SetItemStateChunk(new_item, replaced, false)
-      reaper.SetMediaItemInfo_Value(new_item, "D_POSITION", edit_pos + (it.offset or 0))
+      local pos
+      if use_absolute then
+        if it.abs_pos ~= nil then
+          pos = it.abs_pos
+        elseif pin.payload and pin.payload.anchor_pos then
+          pos = pin.payload.anchor_pos + (it.offset or 0)
+        else
+          pos = edit_pos + (it.offset or 0)
+        end
+      else
+        pos = edit_pos + (it.offset or 0)
+      end
+      reaper.SetMediaItemInfo_Value(new_item, "D_POSITION", pos)
       created_items[#created_items + 1] = new_item
     else
       skipped = skipped + 1
@@ -344,6 +369,11 @@ local function paste_tracks(pin, media_map, missing, created_items)
   end
   apply_track_sends(pin, new_tracks)
   reaper.UpdateArrange()
+
+  reaper.GetSet_LoopTimeRange2(0, true, false, ts_start, ts_end, false)
+  if use_absolute then
+    reaper.SetEditCurPos(cursor_saved, false, false)
+  end
   return skipped
 end
 

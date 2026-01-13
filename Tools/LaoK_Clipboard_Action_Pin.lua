@@ -248,6 +248,7 @@ local function pin_items(project_path)
     pin_type = "ITEMS",
     payload = {
       anchor_mode = "RELATIVE_TO_FIRST_ITEM_START",
+      anchor_pos = anchor_pos or 0,
       base_track_index = base_track_index or 1,
       items = items,
       tracks = {},
@@ -321,6 +322,7 @@ local function pin_tracks(project_path)
         items[#items + 1] = {
           chunk = replaced_chunk,
           offset = pos - anchor_pos,
+          abs_pos = pos,
           track_slot = slot,
         }
 
@@ -352,6 +354,8 @@ local function pin_tracks(project_path)
     pin_type = "TRACKS",
     payload = {
       anchor_mode = "RELATIVE_TO_FIRST_ITEM_START",
+      anchor_pos = anchor_pos,
+      absolute_items = true,
       base_track_index = nil,
       items = items,
       tracks = tracks,

@@ -1,4 +1,4 @@
-# LaoK Clipboard 用户操作手册（V0.132）
+# LaoK Clipboard 用户操作手册（V0.140）
 简单好用的Reaper跨工程搜索与常驻复制粘贴工具！！！
 使用说明：直接在Reapack订阅https://raw.githubusercontent.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/master/index.xml
 之后安装LaoK_Clipboard即可
@@ -22,6 +22,11 @@ v0.13新增功能：
 - 美化布局
 - 限制Pin与Tag按钮最大文本长度
 - 解决部分平台及分辨率下报错的问题
+
+v0.14新增功能：
+- 轨道复制完整支持所有包络信息留存
+- 调整多屏模式下可能造成的卡死
+- Item复制保留区间内除效果器以外的所有包络信息，（暂不支持）
 
 ## 依赖与文件清单
 
