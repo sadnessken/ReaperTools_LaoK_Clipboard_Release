@@ -328,6 +328,28 @@ local function detect_env_value_mode(env, chunk, tag)
   return "raw", mode
 end
 
+local function env_api_value_at_time(env, t)
+  if reaper.Envelope_Evaluate then
+    local v1, v2 = reaper.Envelope_Evaluate(env, t, 0, 0)
+    if type(v2) == "number" then return v2 end
+    if type(v1) == "number" then return v1 end
+  end
+  return nil
+end
+
+local function api_value_to_chunk(value, value_mode, scale_mode)
+  if value == nil then
+    return nil
+  end
+  if value_mode == "scale_from" and reaper.ScaleToEnvelopeMode then
+    return reaper.ScaleToEnvelopeMode(scale_mode or 0, value)
+  end
+  if value_mode == "scale_to" and reaper.ScaleFromEnvelopeMode then
+    return reaper.ScaleFromEnvelopeMode(scale_mode or 0, value)
+  end
+  return value
+end
+
 local function get_track_env_map(track)
   local map = {}
   local count = reaper.CountTrackEnvelopes(track)
@@ -477,12 +499,16 @@ local function pin_items(project_path)
         local pts = collect_env_points(env, pos, pos + len)
         local ais = collect_env_ais(env, pos, pos + len)
         if #pts > 0 or #ais > 0 then
+          local start_api = env_api_value_at_time(env, pos)
+          local end_api = env_api_value_at_time(env, pos + len)
           item_env[tag] = {
             points = pts,
             ais = ais,
             template = entry.template,
             value_mode = entry.value_mode,
             scale_mode = entry.scale_mode,
+            guard_start = api_value_to_chunk(start_api, entry.value_mode, entry.scale_mode),
+            guard_end = api_value_to_chunk(end_api, entry.value_mode, entry.scale_mode),
           }
         end
       end

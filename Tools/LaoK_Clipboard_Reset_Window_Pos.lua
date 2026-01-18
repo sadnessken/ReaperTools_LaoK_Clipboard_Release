@@ -38,7 +38,7 @@ local function move_running_window()
   end
   local hwnd = reaper.JS_Window_Find("LaoK Clipboard", true) or reaper.JS_Window_Find("LaoK Clipboard", false)
   if not hwnd then
-    hwnd = reaper.JS_Window_Find("LaoK Clipboard v0.1.4.1", true) or reaper.JS_Window_Find("LaoK Clipboard v0.1.4.1", false)
+    hwnd = reaper.JS_Window_Find("LaoK Clipboard v0.1.4.2", true) or reaper.JS_Window_Find("LaoK Clipboard v0.1.4.2", false)
   end
   if not hwnd then
     return false

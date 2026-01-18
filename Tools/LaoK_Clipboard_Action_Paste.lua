@@ -682,6 +682,97 @@ local function to_api_env_value(env, tag, value, env_data)
   return normalize_env_value(tag, value)
 end
 
+local DEFAULT_ENV_VALUE = {
+  VOLENV = 1.0,
+  VOLENV2 = 1.0,
+  VOLENV3 = 1.0,
+  PANENV = 0.0,
+  PANENV2 = 0.0,
+  WIDTHENV = 1.0,
+  WIDTHENV2 = 1.0,
+  MUTEENV = 1.0,
+}
+
+local DEFAULT_ENV_SHAPE = {
+  MUTEENV = 1,
+}
+
+local function env_value_at_time(env, tag, t)
+  if reaper.CountEnvelopePoints then
+    local cnt = reaper.CountEnvelopePoints(env)
+    if not cnt or cnt <= 0 then
+      return DEFAULT_ENV_VALUE[tag] or 0.0
+    end
+  end
+  if reaper.Envelope_Evaluate then
+    local v1, v2, v3, v4 = reaper.Envelope_Evaluate(env, t, 0, 0)
+    if type(v2) == "number" then return v2 end
+    if type(v1) == "number" then return v1 end
+  end
+  return DEFAULT_ENV_VALUE[tag] or 0.0
+end
+
+local function first_last_point_time(env)
+  if not (reaper.CountEnvelopePoints and reaper.GetEnvelopePoint) then
+    return nil, nil
+  end
+  local cnt = reaper.CountEnvelopePoints(env)
+  if not cnt or cnt <= 0 then
+    return nil, nil
+  end
+  local ok1, t1 = reaper.GetEnvelopePoint(env, 0)
+  local ok2, t2 = reaper.GetEnvelopePoint(env, cnt - 1)
+  return (ok1 and t1 or nil), (ok2 and t2 or nil)
+end
+
+local function list_has_point_at(points, t, eps)
+  if not points then return false end
+  local tol = eps or 1e-6
+  for _, pt in ipairs(points) do
+    local time = pt.time or 0
+    if math.abs(time - t) <= tol then
+      return true
+    end
+  end
+  return false
+end
+
+local function envelope_has_point_at(env, t, eps)
+  if not (reaper.CountEnvelopePoints and reaper.GetEnvelopePoint) then
+    return false
+  end
+  local cnt = reaper.CountEnvelopePoints(env)
+  local tol = eps or 1e-6
+  if not cnt or cnt <= 0 then
+    return false
+  end
+  for i = 0, cnt - 1 do
+    local ok, time = reaper.GetEnvelopePoint(env, i)
+    if ok and time ~= nil and math.abs(time - t) <= tol then
+      return true
+    end
+  end
+  return false
+end
+
+local function ensure_default_bounds(env, tag, start_t, end_t, env_data)
+  if not env then return end
+  local default_val = DEFAULT_ENV_VALUE[tag] or 0.0
+  if env_data then
+    default_val = to_api_env_value(env, tag, default_val, env_data)
+  end
+  local default_shape = DEFAULT_ENV_SHAPE[tag] or 0
+  local eps = 1e-6
+  if not envelope_has_point_at(env, start_t, eps) then
+    reaper.InsertEnvelopePoint(env, start_t, default_val, default_shape, 0, false, true)
+  end
+  if end_t > start_t + eps then
+    if not envelope_has_point_at(env, end_t, eps) then
+      reaper.InsertEnvelopePoint(env, end_t, default_val, default_shape, 0, false, true)
+    end
+  end
+end
+
 local function build_env_block_with_points(tag, template, points)
   local base = template and sanitize_env_block(template) or build_env_block(tag)
   if not base or base == "" then
@@ -736,6 +827,30 @@ local function apply_env_points_to_track_chunk(track, tag, points, template)
   return true
 end
 
+local function add_range(ranges, start_t, end_t)
+  if not ranges then
+    ranges = {}
+  end
+  local merged_start = start_t
+  local merged_end = end_t
+  local out = {}
+  for _, r in ipairs(ranges) do
+    if merged_end >= r.start - 1e-9 and merged_start <= r["end"] + 1e-9 then
+      if r.start < merged_start then
+        merged_start = r.start
+      end
+      if r["end"] > merged_end then
+        merged_end = r["end"]
+      end
+    else
+      out[#out + 1] = r
+    end
+  end
+  out[#out + 1] = { start = merged_start, ["end"] = merged_end }
+  table.sort(out, function(a, b) return a.start < b.start end)
+  return out
+end
+
 local function paste_items(pin, media_map, missing, created_items)
   local base_track, base_index = get_base_track()
   local base_pin_index = pin.payload.base_track_index or 1
@@ -745,7 +860,9 @@ local function paste_items(pin, media_map, missing, created_items)
   local track_map = {}
   local env_write_queue = {}
   local track_required_tags = {}
+  local track_ranges = {}
   local track_required_templates = {}
+  local track_required_modes = {}
   local chunk_env_points = {}
 
   for _, item in ipairs(pin.payload.items or {}) do
@@ -764,6 +881,10 @@ local function paste_items(pin, media_map, missing, created_items)
     reaper.SetItemStateChunk(new_item, replaced, false)
     local pos = base_offset + (item.offset or 0)
     reaper.SetMediaItemInfo_Value(new_item, "D_POSITION", pos)
+    local item_len = reaper.GetMediaItemInfo_Value(new_item, "D_LENGTH") or 0
+    local ranges = track_ranges[track]
+    local item_end = pos + item_len
+    track_ranges[track] = add_range(ranges, pos, item_end)
     created_items[#created_items + 1] = new_item
 
     if item.env then
@@ -776,9 +897,13 @@ local function paste_items(pin, media_map, missing, created_items)
           if env_data.template and env_data.template ~= "" and not track_required_templates[track][tag] then
             track_required_templates[track][tag] = env_data.template
           end
+          track_required_modes[track] = track_required_modes[track] or {}
+          if not track_required_modes[track][tag] then
+            track_required_modes[track][tag] = { value_mode = env_data.value_mode, scale_mode = env_data.scale_mode }
+          end
         end
       end
-      env_write_queue[#env_write_queue + 1] = { track = track, pos = pos, env = item.env }
+      env_write_queue[#env_write_queue + 1] = { track = track, pos = pos, len = item_len, env = item.env }
     end
   end
 
@@ -795,6 +920,47 @@ local function paste_items(pin, media_map, missing, created_items)
     track_env_maps[track] = build_env_map(track)
   end
 
+  for track, tags in pairs(track_required_tags) do
+    local env_map = track_env_maps[track]
+    local ranges = track_ranges[track]
+    if env_map and ranges then
+      for _, tag in ipairs(TRACK_ENV_TAGS_ORDER) do
+        if tags[tag] then
+          local env = env_map[tag]
+          if env then
+            ensure_envelope_active(env)
+            local env_info = track_required_modes[track] and track_required_modes[track][tag] or nil
+            for _, range in ipairs(ranges) do
+              ensure_default_bounds(env, tag, range.start, range["end"], env_info)
+            end
+            env_sort_needed[env] = true
+          else
+            local track_points = chunk_env_points[track]
+            if not track_points then
+              track_points = {}
+              chunk_env_points[track] = track_points
+            end
+            local list = track_points[tag]
+            if not list then
+              list = {}
+              track_points[tag] = list
+            end
+            local default_val = DEFAULT_ENV_VALUE[tag] or 0.0
+            local default_shape = DEFAULT_ENV_SHAPE[tag] or 0
+            for _, range in ipairs(ranges) do
+              if not list_has_point_at(list, range.start) then
+                list[#list + 1] = { time = range.start, value = default_val, shape = default_shape, tension = 0, selected = false }
+              end
+              if not list_has_point_at(list, range["end"]) then
+                list[#list + 1] = { time = range["end"], value = default_val, shape = default_shape, tension = 0, selected = false }
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
   for _, entry in ipairs(env_write_queue) do
     local env_map = track_env_maps[entry.track]
     if env_map then
@@ -804,6 +970,8 @@ local function paste_items(pin, media_map, missing, created_items)
           local env = env_map[tag]
           if env then
             ensure_envelope_active(env)
+            local seg_start = entry.pos
+            local seg_end = entry.pos + (entry.len or 0)
             for _, pt in ipairs(env_data.points or {}) do
               local value = to_api_env_value(env, tag, pt.value or 0, env_data)
               reaper.InsertEnvelopePoint(env, entry.pos + (pt.time or 0), value, pt.shape or 0, pt.tension or 0, pt.selected or false, true)
@@ -951,6 +1119,7 @@ local function paste_tracks(pin, media_map, missing, created_items)
         pos = edit_pos + (it.offset or 0)
       end
       reaper.SetMediaItemInfo_Value(new_item, "D_POSITION", pos)
+    local item_len = reaper.GetMediaItemInfo_Value(new_item, "D_LENGTH") or 0
       created_items[#created_items + 1] = new_item
     else
       skipped = skipped + 1

@@ -24,10 +24,11 @@ v0.13新增功能：
 - 解决部分平台及分辨率下报错的问题
 
 v0.14新增功能：
+- 设置新增关闭控制台打印
 - 轨道复制完整支持所有包络信息留存
 - 调整多屏模式下可能造成的卡死，逻辑重构。
-- Item复制保留区间内Track envelopes的包络信息（已知在Track envelopes全开时，TrimVolume的值可能会异常）
-- 新增Reset_Window脚本，用于未知情况下将窗口拖动到不可操作时的应急处理。
+- Item复制保留区间内Track envelopes的包络信息
+- 新增Reset_Window脚本，用于未知情况下将窗口拖动到不可操作区域时的应急处理。
 
 ## 依赖与文件清单
 
@@ -158,6 +159,12 @@ v0.14新增功能：
 - 功能区域：
   - `Debounce (ms)`：搜索防抖
   - `Max results`：最大搜索结果数
+
+### 8) 应急操作
+- 当出现窗口无法拖动、无法操作时，先进入Action，将`LaoK_Clipboard_Main.lua`关闭运行
+- 运行`LaoK_Clipboard_Reset_Window_Pos.lua`
+- 再次激活`LaoK_Clipboard_Main.lua`
+- 如果遇到窗口没有显示，请点击您设置的MainBar按钮，或者运行`LaoK_Clipboard_Toolbar_Toggle.lua`
 
 ## 常见问题定位
 

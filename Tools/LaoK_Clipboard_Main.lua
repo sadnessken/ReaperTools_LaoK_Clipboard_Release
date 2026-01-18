@@ -1,5 +1,5 @@
 -- @description LaoK Clipboard (Main + Actions)
--- @version 0.1.4.1
+-- @version 0.1.4.2
 -- @author sadnessken
 -- @about
 --   LaoK_Clipboard：REAPER 常驻窗口工具（Pin/Paste/Toolbar Toggle 等脚本打包安装）。
@@ -15,6 +15,7 @@
 --   LaoK_Clipboard_UI_Style.lua 
 --   LaoK_Clipboard_UserData.lua
 --   LaoK_Clipboard_Window.lua
+--   LaoK_Clipboard_Reset_Window_Pos.lua
 -- @changelog
 --   + Initial release
 local info = debug.getinfo(1, "S")
