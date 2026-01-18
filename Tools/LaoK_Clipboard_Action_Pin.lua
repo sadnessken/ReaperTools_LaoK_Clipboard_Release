@@ -168,6 +168,251 @@ local function collect_internal_sends(selected_tracks)
   return sends
 end
 
+local TRACK_ENV_TAGS = {
+  "VOLENV",
+  "PANENV",
+  "WIDTHENV",
+  "VOLENV2",
+  "PANENV2",
+  "WIDTHENV2",
+  "VOLENV3",
+  "MUTEENV",
+}
+
+local TRACK_ENV_TAGS_ORDER = TRACK_ENV_TAGS
+
+local TRACK_ENV_TAG_SET = {}
+for _, tag in ipairs(TRACK_ENV_TAGS) do
+  TRACK_ENV_TAG_SET[tag] = true
+end
+
+local function get_env_tag_from_chunk(chunk)
+  if not chunk or chunk == "" then return nil end
+  return chunk:match("<%s*([A-Z0-9_]+)")
+end
+
+local function sanitize_env_block(chunk)
+  if not chunk or chunk == "" then return nil end
+  local lines = {}
+  for line in chunk:gmatch("[^\r\n]+") do
+    if line == ">" then
+      -- skip, re-add later
+    elseif line:match("^EGUID%s") then
+      -- skip, re-add with new guid
+    elseif line:match("^PT%s") or line:match("^AI%s") or line:match("^AIPT%s") or line:match("^AIM%s") then
+      -- skip automation data
+    else
+      lines[#lines + 1] = line
+    end
+  end
+  if #lines == 0 or not lines[1]:match("^<") then
+    return nil
+  end
+  table.insert(lines, 2, "EGUID " .. reaper.genGuid())
+
+  local has_act, has_vis, has_arm = false, false, false
+  for i, line in ipairs(lines) do
+    if line:match("^ACT%s") then
+      lines[i] = line:gsub("^ACT%s+%d+", "ACT 1")
+      has_act = true
+    elseif line:match("^VIS%s") then
+      lines[i] = line:gsub("^VIS%s+[%d%.%-]+%s+[%d%.%-]+%s+[%d%.%-]+", "VIS 1 1 1")
+      has_vis = true
+    elseif line:match("^ARM%s") then
+      lines[i] = line:gsub("^ARM%s+%d+", "ARM 1")
+      has_arm = true
+    end
+  end
+  if not has_act then lines[#lines + 1] = "ACT 1" end
+  if not has_vis then lines[#lines + 1] = "VIS 1 1 1" end
+  if not has_arm then lines[#lines + 1] = "ARM 1" end
+  lines[#lines + 1] = ">"
+  return table.concat(lines, "\n")
+end
+
+local function get_sample_pt(chunk, prefer_not_one)
+  if not chunk or chunk == "" then
+    return nil, nil
+  end
+  local first_time, first_value
+  for line in chunk:gmatch("[^\r\n]+") do
+    if line:sub(1, 2) == "PT" then
+      local parts = {}
+      for w in line:gmatch("%S+") do
+        parts[#parts + 1] = w
+      end
+      if parts[1] == "PT" and #parts >= 3 then
+        local time = tonumber(parts[2])
+        local value = tonumber(parts[3])
+        if time and value then
+          if first_time == nil then
+            first_time, first_value = time, value
+          end
+          if prefer_not_one and math.abs(value - 1) > 1e-6 then
+            return time, value
+          end
+        end
+      end
+    end
+  end
+  return first_time, first_value
+end
+
+local function find_api_point_by_time(env, target_time)
+  if not (reaper.CountEnvelopePoints and reaper.GetEnvelopePoint) then
+    return nil
+  end
+  local count = reaper.CountEnvelopePoints(env)
+  if not count or count == 0 or target_time == nil then
+    return nil
+  end
+  local closest_val
+  local closest_dt
+  for i = 0, count - 1 do
+    local ok, time, value = reaper.GetEnvelopePoint(env, i)
+    if ok and time ~= nil then
+      local dt = math.abs(time - target_time)
+      if closest_dt == nil or dt < closest_dt then
+        closest_dt = dt
+        closest_val = value
+      end
+    end
+  end
+  return closest_val
+end
+
+local function detect_env_value_mode(env, chunk, tag)
+  local mode = reaper.GetEnvelopeScalingMode and reaper.GetEnvelopeScalingMode(env) or nil
+  if not (reaper.CountEnvelopePoints and reaper.GetEnvelopePoint) then
+    return "raw", mode
+  end
+  local count = reaper.CountEnvelopePoints(env)
+  if not count or count == 0 then
+    return "raw", mode
+  end
+  local prefer_not_one = (tag == "VOLENV" or tag == "VOLENV2" or tag == "VOLENV3")
+  local sample_time, sample_value = get_sample_pt(chunk, prefer_not_one)
+  if sample_time == nil or sample_value == nil then
+    return "raw", mode
+  end
+  local api_val = find_api_point_by_time(env, sample_time)
+  if api_val == nil then
+    return "raw", mode
+  end
+
+  local function near(a, b)
+    if a == nil or b == nil then
+      return false
+    end
+    local diff = math.abs(a - b)
+    local scale = math.max(1, math.abs(a), math.abs(b))
+    return diff <= 1e-6 or diff <= 1e-4 * scale
+  end
+
+  if near(api_val, sample_value) then
+    return "raw", mode
+  end
+  if mode ~= nil and reaper.ScaleFromEnvelopeMode then
+    local scaled = reaper.ScaleFromEnvelopeMode(mode, sample_value)
+    if near(api_val, scaled) then
+      return "scale_from", mode
+    end
+  end
+  if mode ~= nil and reaper.ScaleToEnvelopeMode then
+    local raw = reaper.ScaleToEnvelopeMode(mode, sample_value)
+    if near(api_val, raw) then
+      return "scale_to", mode
+    end
+  end
+
+  return "raw", mode
+end
+
+local function get_track_env_map(track)
+  local map = {}
+  local count = reaper.CountTrackEnvelopes(track)
+  for i = 0, count - 1 do
+    local env = reaper.GetTrackEnvelope(track, i)
+    if env and reaper.GetEnvelopeStateChunk then
+      local ok, chunk = reaper.GetEnvelopeStateChunk(env, "", false)
+      if ok then
+        local tag = get_env_tag_from_chunk(chunk)
+        if tag and TRACK_ENV_TAG_SET[tag] then
+          local value_mode, scale_mode = detect_env_value_mode(env, chunk, tag)
+          map[tag] = {
+            env = env,
+            template = sanitize_env_block(chunk),
+            value_mode = value_mode,
+            scale_mode = scale_mode,
+          }
+        end
+      end
+    end
+  end
+  return map
+end
+
+local function collect_env_points(env, t0, t1)
+  local points = {}
+  if not reaper.GetEnvelopeStateChunk then
+    return points
+  end
+  local ok, chunk = reaper.GetEnvelopeStateChunk(env, "", false)
+  if not ok or not chunk or chunk == "" then
+    return points
+  end
+  for line in chunk:gmatch("[^\r\n]+") do
+    if line:sub(1, 2) == "PT" then
+      local parts = {}
+      for w in line:gmatch("%S+") do
+        parts[#parts + 1] = w
+      end
+      if parts[1] == "PT" and #parts >= 3 then
+        local time = tonumber(parts[2])
+        local value = tonumber(parts[3])
+        if time and value and time >= t0 and time <= t1 then
+          local shape = tonumber(parts[4]) or 0
+          local tension = tonumber(parts[5]) or 0
+          local selected = tonumber(parts[6]) or 0
+          points[#points + 1] = {
+            time = time - t0,
+            value = value,
+            shape = shape,
+            tension = tension,
+            selected = (selected ~= 0),
+          }
+        end
+      end
+    end
+  end
+  return points
+end
+
+local function collect_env_ais(env, t0, t1)
+  local ais = {}
+  if reaper.CountAutomationItems and reaper.GetSetAutomationItemInfo then
+    local ai_count = reaper.CountAutomationItems(env)
+    for ai = 0, ai_count - 1 do
+      local pos = reaper.GetSetAutomationItemInfo(env, ai, "D_POSITION", 0, false)
+      local len = reaper.GetSetAutomationItemInfo(env, ai, "D_LENGTH", 0, false)
+      local ai_end = pos + len
+      if ai_end >= t0 and pos <= t1 then
+        ais[#ais + 1] = {
+          pos = pos - t0,
+          length = len,
+          startoffs = reaper.GetSetAutomationItemInfo(env, ai, "D_STARTOFFS", 0, false),
+          playrate = reaper.GetSetAutomationItemInfo(env, ai, "D_PLAYRATE", 0, false),
+          baseline = reaper.GetSetAutomationItemInfo(env, ai, "D_BASELINE", 0, false),
+          amplitude = reaper.GetSetAutomationItemInfo(env, ai, "D_AMPLITUDE", 0, false),
+          loop = reaper.GetSetAutomationItemInfo(env, ai, "B_LOOP", 0, false),
+          pool_id = reaper.GetSetAutomationItemInfo(env, ai, "D_POOL_ID", 0, false),
+        }
+      end
+    end
+  end
+  return ais
+end
+
 local function pin_items(project_path)
   local count = reaper.CountSelectedMediaItems(0)
   if count == 0 then return nil, "Nothing selected" end
@@ -177,6 +422,7 @@ local function pin_items(project_path)
   local seen_media = {}
   local anchor_pos = nil
   local base_track_index = nil
+  local env_map_cache = {}
   local default_name = nil
 
   for i = 0, count - 1 do
@@ -186,6 +432,7 @@ local function pin_items(project_path)
       return nil, "Failed to read item chunk"
     end
     local pos = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+    local len = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
     if not anchor_pos or pos < anchor_pos then
       anchor_pos = pos
     end
@@ -216,6 +463,33 @@ local function pin_items(project_path)
       pos = pos,
       track_index = track_index,
     }
+
+    local env_map = env_map_cache[track]
+    if not env_map then
+      env_map = get_track_env_map(track)
+      env_map_cache[track] = env_map
+    end
+    local item_env = {}
+    for _, tag in ipairs(TRACK_ENV_TAGS_ORDER) do
+      local entry = env_map[tag]
+      if entry then
+        local env = entry.env
+        local pts = collect_env_points(env, pos, pos + len)
+        local ais = collect_env_ais(env, pos, pos + len)
+        if #pts > 0 or #ais > 0 then
+          item_env[tag] = {
+            points = pts,
+            ais = ais,
+            template = entry.template,
+            value_mode = entry.value_mode,
+            scale_mode = entry.scale_mode,
+          }
+        end
+      end
+    end
+    if next(item_env) then
+      items[#items].env = item_env
+    end
 
     for _, path in ipairs(abs_paths) do
       if path ~= "" and not seen_media[path] then
@@ -278,6 +552,7 @@ local function pin_tracks(project_path)
     for i = 0, item_count - 1 do
       local item = reaper.GetTrackMediaItem(track, i)
       local pos = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+    local len = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
       if not anchor_pos or pos < anchor_pos then
         anchor_pos = pos
       end
@@ -316,6 +591,7 @@ local function pin_tracks(project_path)
       local ok_item, item_chunk = reaper.GetItemStateChunk(item, "", false)
       if ok_item then
         local pos = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+    local len = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
         local file_map, abs_paths = build_item_file_map(item, item_chunk, project_path)
         local replaced_chunk = replace_chunk_file_paths_map(item_chunk, file_map)
 

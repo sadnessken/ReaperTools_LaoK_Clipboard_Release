@@ -25,8 +25,9 @@ v0.13新增功能：
 
 v0.14新增功能：
 - 轨道复制完整支持所有包络信息留存
-- 调整多屏模式下可能造成的卡死
-- Item复制保留区间内除效果器以外的所有包络信息，（暂不支持）
+- 调整多屏模式下可能造成的卡死，逻辑重构。
+- Item复制保留区间内Track envelopes的包络信息（已知在Track envelopes全开时，TrimVolume的值可能会异常）
+- 新增Reset_Window脚本，用于未知情况下将窗口拖动到不可操作时的应急处理。
 
 ## 依赖与文件清单
 
@@ -39,7 +40,9 @@ v0.14新增功能：
   - `LaoK_Clipboard_Main.lua`（主界面）
   - `LaoK_Clipboard_Action_Pin.lua`（Pin）
   - `LaoK_Clipboard_Action_Paste.lua`（Paste）
-  - `LaoK_Clipboard_Toolbar_Toggle.lua`（工具栏切换显示/隐藏）
+  - `LaoK_Clipboard_Toolbar_Toggle.lua`（工具栏切换显示/隐
+  藏）
+  - `LaoK_Clipboard_Reset_Window_Pos.lua` （应急重置窗口）
   - `LaoK_Clipboard_Shared.lua`（共享库）
 
 ## 初次设置教程

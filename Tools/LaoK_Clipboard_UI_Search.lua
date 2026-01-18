@@ -77,8 +77,8 @@ local function draw_search_results(ctx, common, state, style)
   local height = compute_search_dropdown_height(common, state)
   if height <= 0 then return end
 
-  local ok = style.BeginChild(ctx, "SearchDropdown", -1, height, true)
-  if ok then
+  local visible, started = style.BeginChild(ctx, "SearchDropdown", -1, height, true)
+  if visible then
     local avail = reaper.ImGui_GetContentRegionAvail(ctx)
     local pop_colors = 0
     if reaper.ImGui_Col_Border then
@@ -145,6 +145,8 @@ local function draw_search_results(ctx, common, state, style)
     if pop_colors > 0 then
       reaper.ImGui_PopStyleColor(ctx, pop_colors)
     end
+  end
+  if started then
     reaper.ImGui_EndChild(ctx)
   end
 end

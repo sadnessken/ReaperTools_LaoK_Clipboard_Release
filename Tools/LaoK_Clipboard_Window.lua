@@ -1,6 +1,11 @@
 -- @noindex
 local M = {}
 
+local function is_windows()
+  local osname = (reaper.GetOS and reaper.GetOS()) or ""
+  return (osname:match("Win") or osname:match("win")) ~= nil
+end
+
 local function get_main_window_rect()
   if not (reaper.GetMainHwnd and reaper.JS_Window_GetRect) then return nil end
   local hwnd = reaper.GetMainHwnd()
@@ -24,9 +29,8 @@ local function get_main_window_rect()
   return l, t, r, b
 end
 
-local function clamp_to_viewport(x, y, w, h)
-  if not x or not y or not w or not h then return x, y end
 
+local function get_viewport_bounds(x, y, w, h)
   local l, t, r, b
   if reaper.my_getViewport then
     local ok, v1, v2, v3, v4, v5 = pcall(reaper.my_getViewport, 0, 0, 0, 0, x, y, x + w, y + h, true)
@@ -44,8 +48,23 @@ local function clamp_to_viewport(x, y, w, h)
   end
 
   if not (l and t and r and b) then
+    return nil
+  end
+  if type(l) ~= "number" or type(t) ~= "number" or type(r) ~= "number" or type(b) ~= "number" then
+    return nil
+  end
+  return l, t, r, b
+end
+
+local function clamp_to_viewport(x, y, w, h)
+  if is_windows() then return x, y end
+  if not x or not y or not w or not h then return x, y end
+
+  local bounds = get_viewport_bounds(x, y, w, h)
+  if not bounds then
     return x, y
   end
+  local l, t, r, b = bounds
 
   local pad = 20
   local min_x = l + pad
@@ -115,7 +134,9 @@ function M.ApplyNextWindowPos(ctx, common, state, desired_w, desired_h)
     if not x or not y then
       x, y = get_first_run_window_pos(desired_w, desired_h)
     end
+  if not is_windows() then
     x, y = clamp_to_viewport(x, y, desired_w, desired_h)
+  end
     reaper.ImGui_SetNextWindowPos(ctx, x, y, reaper.ImGui_Cond_Always())
   end
 end
@@ -129,12 +150,25 @@ function M.UpdateAndPersistWindowPos(ctx, common, state, desired_w, desired_h, n
     end
     local clamp_w = ww or desired_w
     local clamp_h = wh or desired_h
-    local cx, cy = clamp_to_viewport(wx, wy, clamp_w, clamp_h)
-    local dx = cx - wx
-    local dy = cy - wy
-    if (math.abs(dx) > 10) or (math.abs(dy) > 10) then
-      state.win_force_x, state.win_force_y = cx, cy
-      state.win_pos_apply = true
+    if (not is_windows()) and (not state.win_dragging) then
+      local bounds = get_viewport_bounds(wx, wy, clamp_w, clamp_h)
+      if bounds then
+        local l, t, r, b = bounds
+        local pad = 20
+        local out_left = (wx + clamp_w) < (l + pad)
+        local out_right = wx > (r - pad)
+        local out_top = (wy + clamp_h) < (t + pad)
+        local out_bottom = wy > (b - pad)
+        if out_left or out_right or out_top or out_bottom then
+          local cx, cy = clamp_to_viewport(wx, wy, clamp_w, clamp_h)
+          local dx = cx - wx
+          local dy = cy - wy
+          if (math.abs(dx) > 10) or (math.abs(dy) > 10) then
+            state.win_force_x, state.win_force_y = cx, cy
+            state.win_pos_apply = true
+          end
+        end
+      end
     end
 
     local moved = (not state.last_win_x) or (math.abs(wx - state.last_win_x) > 0.5) or (math.abs(wy - state.last_win_y) > 0.5)

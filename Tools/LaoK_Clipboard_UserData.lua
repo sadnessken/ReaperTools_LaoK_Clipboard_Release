@@ -241,8 +241,8 @@ function M.DrawUserSetup(ctx, common, state, style)
     if style.ButtonCentered(ctx, "Open", "user_setup_open", btn_w, 30, style.Colors.text_dark) then
       M.SwitchUser(common, state)
     end
-    reaper.ImGui_End(ctx)
   end
+  reaper.ImGui_End(ctx)
   style.PopStyle(ctx)
 end
 
@@ -345,8 +345,8 @@ function M.DrawSettings(ctx, common, state, style)
     reaper.ImGui_SetCursorPos(ctx, 12, title_h + 12)
 
     reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_WindowPadding(), 10, user_pad_y)
-    local user_ok = style.BeginChild(ctx, "SettingsUserData", -1, user_h, true)
-    if user_ok then
+    local user_visible, user_started = style.BeginChild(ctx, "SettingsUserData", -1, user_h, true)
+    if user_visible then
       local user_name = state.user_data.user_name or "DefaultUser"
       reaper.ImGui_Text(ctx, "User: " .. user_name)
 
@@ -370,14 +370,16 @@ function M.DrawSettings(ctx, common, state, style)
 
       local path_text = state.current_path ~= "" and state.current_path or "<no user data>"
       reaper.ImGui_Text(ctx, "Path: " .. path_text)
+    end
+    if user_started then
       reaper.ImGui_EndChild(ctx)
     end
     reaper.ImGui_PopStyleVar(ctx)
 
     reaper.ImGui_Dummy(ctx, 0, gap)
 
-    local settings_ok = style.BeginChild(ctx, "SettingsOptions", -1, settings_h, true)
-    if settings_ok then
+    local settings_visible, settings_started = style.BeginChild(ctx, "SettingsOptions", -1, settings_h, true)
+    if settings_visible then
       local settings = state.user_data.settings
       if not settings then
         settings = common.DefaultSettings()
@@ -396,11 +398,17 @@ function M.DrawSettings(ctx, common, state, style)
         state._set_dirty(true)
         state.search_dirty = true
       end
+
+      changed, settings.disable_paste_console_logs = reaper.ImGui_Checkbox(ctx, "Disable paste console logs", settings.disable_paste_console_logs or false)
+      if changed and state._set_dirty then
+        state._set_dirty(true)
+      end
+    end
+    if settings_started then
       reaper.ImGui_EndChild(ctx)
     end
-
-    reaper.ImGui_End(ctx)
   end
+  reaper.ImGui_End(ctx)
   style.PopStyle(ctx)
   if not open then
     state.settings_open = false

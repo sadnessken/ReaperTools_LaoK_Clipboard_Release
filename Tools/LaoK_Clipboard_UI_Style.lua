@@ -1,6 +1,12 @@
 -- @noindex
 local M = {}
 
+-- Titlebar drag state (module-local)
+local _drag_active = false
+local _drag_start_mx, _drag_start_my = 0, 0
+local _drag_start_wx, _drag_start_wy = 0, 0
+
+
 local function hex_color(hex, alpha)
   local r = ((hex >> 16) & 0xFF) / 255
   local g = ((hex >> 8) & 0xFF) / 255
@@ -155,43 +161,90 @@ function M.ButtonCentered(ctx, text, id, w, h, text_color)
 end
 
 local begin_child_signature = nil
+local begin_child_end_on_false = false
+
+local function detect_begin_child_signature(ctx)
+  local id = "__BC_PROBE__"
+  local w, h = 10, 10
+  local flags = 0
+  if reaper.ImGui_ChildFlags_Border then
+    flags = reaper.ImGui_ChildFlags_Border()
+  end
+
+  local function probe(call_fn)
+    local ok = pcall(function()
+      call_fn()
+      reaper.ImGui_EndChild(ctx)
+    end)
+    return ok
+  end
+
+  if probe(function() reaper.ImGui_BeginChild(ctx, id, w, h, flags) end) then
+    begin_child_signature = "flags"
+  elseif probe(function() reaper.ImGui_BeginChild(ctx, id, w, h, false) end) then
+    begin_child_signature = "border"
+  elseif probe(function() reaper.ImGui_BeginChild(ctx, id, w, h, false, flags) end) then
+    begin_child_signature = "border_flags"
+  end
+
+  if not begin_child_signature then
+    return
+  end
+
+  local function begin_probe_0(fn)
+    local ok, visible = pcall(fn)
+    if not ok then
+      return false, nil
+    end
+    return true, visible
+  end
+
+  local ok, visible = false, nil
+  if begin_child_signature == "flags" then
+    ok, visible = begin_probe_0(function() return reaper.ImGui_BeginChild(ctx, id, 0, 0, flags) end)
+  elseif begin_child_signature == "border" then
+    ok, visible = begin_probe_0(function() return reaper.ImGui_BeginChild(ctx, id, 0, 0, false) end)
+  else
+    ok, visible = begin_probe_0(function() return reaper.ImGui_BeginChild(ctx, id, 0, 0, false, flags) end)
+  end
+
+  if ok and visible == false then
+    local end_ok = pcall(reaper.ImGui_EndChild, ctx)
+    begin_child_end_on_false = end_ok
+  elseif ok and visible ~= nil then
+    pcall(reaper.ImGui_EndChild, ctx)
+  end
+end
 
 function M.BeginChild(ctx, id, w, h, border)
+  if not begin_child_signature then
+    detect_begin_child_signature(ctx)
+  end
+  if not begin_child_signature then
+    return false, false
+  end
+
   local flags = 0
   if reaper.ImGui_ChildFlags_Border and border then
     flags = reaper.ImGui_ChildFlags_Border()
   end
 
   if begin_child_signature == "flags" then
-    local ok = pcall(reaper.ImGui_BeginChild, ctx, id, w, h, flags)
-    if ok then return true end
-    begin_child_signature = nil
-  elseif begin_child_signature == "border" then
-    local ok = pcall(reaper.ImGui_BeginChild, ctx, id, w, h, border)
-    if ok then return true end
-    begin_child_signature = nil
-  elseif begin_child_signature == "border_flags" then
-    local ok = pcall(reaper.ImGui_BeginChild, ctx, id, w, h, border, flags)
-    if ok then return true end
-    begin_child_signature = nil
+    local visible = reaper.ImGui_BeginChild(ctx, id, w, h, flags)
+    if visible == nil then return false, false end
+    if visible == false and not begin_child_end_on_false then return false, false end
+    return visible, true
   end
-
-  local ok = pcall(reaper.ImGui_BeginChild, ctx, id, w, h, flags)
-  if ok then
-    begin_child_signature = "flags"
-    return true
+  if begin_child_signature == "border" then
+    local visible = reaper.ImGui_BeginChild(ctx, id, w, h, border)
+    if visible == nil then return false, false end
+    if visible == false and not begin_child_end_on_false then return false, false end
+    return visible, true
   end
-  ok = pcall(reaper.ImGui_BeginChild, ctx, id, w, h, border)
-  if ok then
-    begin_child_signature = "border"
-    return true
-  end
-  ok = pcall(reaper.ImGui_BeginChild, ctx, id, w, h, border, flags)
-  if ok then
-    begin_child_signature = "border_flags"
-    return true
-  end
-  return false
+  local visible = reaper.ImGui_BeginChild(ctx, id, w, h, border, flags)
+  if visible == nil then return false, false end
+  if visible == false and not begin_child_end_on_false then return false, false end
+  return visible, true
 end
 
 local function draw_icon_button(ctx, label, x, y, size)
@@ -209,7 +262,7 @@ function M.DrawTitleBar(ctx)
 
   reaper.ImGui_DrawList_AddRectFilled(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_bg, 0)
   reaper.ImGui_DrawList_AddRect(draw_list, pos_x, pos_y, pos_x + width, pos_y + title_h, COLORS.title_border, 0, 0, 1.2)
-  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.1.4.0")
+  reaper.ImGui_DrawList_AddText(draw_list, pos_x + 12, pos_y + 6, COLORS.text, "LaoK Clipboard v0.1.4.1")
 
   local icon_size = 14
   local pad = 12
@@ -217,26 +270,6 @@ function M.DrawTitleBar(ctx)
   local cy = icon_y + icon_size / 2
   local x_hide = pos_x + width - pad - icon_size
   local x_settings = x_hide - 10 - icon_size
-
-  local drag_w = width - (icon_size * 2 + pad * 2 + 16)
-  if drag_w < 40 then drag_w = 40 end
-  reaper.ImGui_SetCursorScreenPos(ctx, pos_x + 4, pos_y)
-  reaper.ImGui_InvisibleButton(ctx, "##title_drag", drag_w, title_h)
-  if reaper.ImGui_IsItemActive(ctx) and reaper.ImGui_IsMouseDragging(ctx, 0) then
-    local dx, dy = 0, 0
-    if reaper.ImGui_GetMouseDelta then
-      dx, dy = reaper.ImGui_GetMouseDelta(ctx)
-    elseif reaper.ImGui_GetMouseDragDelta then
-      dx, dy = reaper.ImGui_GetMouseDragDelta(ctx, 0)
-      if reaper.ImGui_ResetMouseDragDelta then
-        reaper.ImGui_ResetMouseDragDelta(ctx, 0)
-      end
-    end
-    local wx, wy = reaper.ImGui_GetWindowPos(ctx)
-    if reaper.ImGui_SetWindowPos then
-      reaper.ImGui_SetWindowPos(ctx, wx + dx, wy + dy, reaper.ImGui_Cond_Always())
-    end
-  end
 
   local hovered, clicked = draw_icon_button(ctx, "##hide", x_hide, icon_y, icon_size)
   local color = hovered and COLORS.title_icon_hover or COLORS.title_icon

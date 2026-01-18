@@ -418,6 +418,7 @@ function M.DefaultSettings()
     log_level = "INFO",
     search_dropdown_max_h = 260,
     hash_dedupe_enabled = true,
+    disable_paste_console_logs = false,
     hash_failure_mode = "FALLBACK",
     peaks_refresh_after_paste = false,
   }

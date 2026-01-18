@@ -1,5 +1,5 @@
 -- @description LaoK Clipboard (Main + Actions)
--- @version 0.1.4.0
+-- @version 0.1.4.1
 -- @author sadnessken
 -- @about
 --   LaoK_Clipboard：REAPER 常驻窗口工具（Pin/Paste/Toolbar Toggle 等脚本打包安装）。
@@ -141,9 +141,38 @@ local function set_ui_visible(v)
   local was = state.ui_visible
   state.ui_visible = v
   State.SaveUIStateToExt(common, state)
-  if (not was) and v then
-    state.win_pos_apply = true
+end
+
+
+local function get_safe_pos(w, h)
+  if reaper.GetMainHwnd and reaper.JS_Window_GetRect then
+    local hwnd = reaper.GetMainHwnd()
+    if hwnd then
+      local ok, v1, v2, v3, v4, v5 = pcall(reaper.JS_Window_GetRect, hwnd)
+      if ok then
+        local l, t, r, b
+        if type(v1) == "boolean" then
+          if v1 then l, t, r, b = v2, v3, v4, v5 end
+        else
+          l, t, r, b = v1, v2, v3, v4
+        end
+        if type(l) == "number" and type(t) == "number" then
+          return l + 60, t + 60
+        end
+      end
+    end
   end
+  return 120, 120
+end
+
+local function maybe_apply_window_reset(w, h)
+  local val = common.GetExtState("reset_window_pos")
+  if val == "" or val == "0" then
+    return
+  end
+  local x, y = get_safe_pos(w, h)
+  reaper.ImGui_SetNextWindowPos(ctx, x, y, reaper.ImGui_Cond_Always())
+  common.SetExtState("reset_window_pos", "", false)
 end
 
 local function consume_toggle_request()
@@ -209,20 +238,12 @@ local function loop()
     if reaper.ImGui_WindowFlags_NoDocking then
       flags = flags | reaper.ImGui_WindowFlags_NoDocking()
     end
-    if reaper.ImGui_WindowFlags_NoSavedSettings then
-      flags = flags | reaper.ImGui_WindowFlags_NoSavedSettings()
-    end
 
-    Window.ApplyNextWindowPos(ctx, common, state, desired_w, desired_h)
+    maybe_apply_window_reset(desired_w, desired_h)
 
     local visible
     visible, open = reaper.ImGui_Begin(ctx, "LaoK Clipboard", true, flags)
     if visible then
-      if state.win_pos_apply then
-        state.win_pos_apply = false
-        state.win_force_x, state.win_force_y = nil, nil
-      end
-
       local title_h, hide_clicked, settings_clicked = Style.DrawTitleBar(ctx)
       if settings_clicked then
         state.settings_open = true
@@ -237,9 +258,8 @@ local function loop()
       UIPins.DrawPinsArea(ctx, common, state, Style, layout)
       reaper.ImGui_Dummy(ctx, 0, 8)
 
-      Window.UpdateAndPersistWindowPos(ctx, common, state, desired_w, desired_h, now)
-      reaper.ImGui_End(ctx)
     end
+    reaper.ImGui_End(ctx)
     Style.PopStyle(ctx)
   end
 

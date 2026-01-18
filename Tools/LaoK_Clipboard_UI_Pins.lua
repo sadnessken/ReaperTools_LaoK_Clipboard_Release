@@ -1,6 +1,7 @@
 -- @noindex
 local M = {}
 
+
 local function count_pins_for_tag(pins, tag_id)
   local count = 0
   for _, pin in ipairs(pins) do
@@ -82,166 +83,173 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
     spacing_pushed = true
   end
 
-  local pins_area_ok = style.BeginChild(ctx, "PinsArea", -1, pins_area_h, false)
-  if not pins_area_ok then
+  local pins_area_visible, pins_area_started = style.BeginChild(ctx, "PinsArea", -1, pins_area_h, false)
+  if not pins_area_started then
     if spacing_pushed then reaper.ImGui_PopStyleVar(ctx) end
     return
   end
 
-  reaper.ImGui_BeginGroup(ctx)
-  local tag_child_ok = style.BeginChild(ctx, "TagList", tag_w, tag_child_h, true)
-  if tag_child_ok then
-    for i, tag in ipairs(tags) do
-      local is_active = tag.tag_id == state.selected_tag_id
-      local text_color = is_active and style.Colors.text_dark or style.Colors.text
-      local pop_colors
-      if is_active then
-        pop_colors = style.PushButtonColors(ctx, style.Colors.teal, style.Colors.teal_hover, style.Colors.teal_active)
-      else
-        pop_colors = style.PushButtonColors(ctx, style.Colors.tag_idle, style.Colors.tag_hover, style.Colors.tag_active)
-      end
-      local tag_label = tag.name or ""
-      if #tag_label > max_tag_label_len then
-        tag_label = tag_label:sub(1, max_tag_label_len)
-      end
-      if style.ButtonCentered(ctx, tag_label, "tag_btn_" .. tag.tag_id, -1, tag_btn_h, text_color) then
-        state.selected_tag_id = tag.tag_id
-        common.SetExtState("selected_tag_id", state.selected_tag_id)
-      end
-      reaper.ImGui_PopStyleColor(ctx, pop_colors)
-
-      if reaper.ImGui_BeginPopupContextItem(ctx) then
-        if reaper.ImGui_MenuItem(ctx, "Rename") then
-          state.rename_tag_id = tag.tag_id
-          state.rename_tag_text = tag.name
-          state.rename_tag_open = true
+  if pins_area_visible then
+    local start_x, start_y = reaper.ImGui_GetCursorPos(ctx)
+    local tag_visible, tag_started = style.BeginChild(ctx, "TagList", tag_w, tag_child_h, true)
+    if tag_visible then
+      for i, tag in ipairs(tags) do
+        local is_active = tag.tag_id == state.selected_tag_id
+        local text_color = is_active and style.Colors.text_dark or style.Colors.text
+        local pop_colors
+        if is_active then
+          pop_colors = style.PushButtonColors(ctx, style.Colors.teal, style.Colors.teal_hover, style.Colors.teal_active)
+        else
+          pop_colors = style.PushButtonColors(ctx, style.Colors.tag_idle, style.Colors.tag_hover, style.Colors.tag_active)
         end
-        local allow_delete = tag.tag_id ~= default_tag_id
-        if reaper.ImGui_MenuItem(ctx, "Delete", nil, false, allow_delete) then
-          for pi = #pins, 1, -1 do
-            if pins[pi].tag_id == tag.tag_id then
-              pins[pi].tag_id = default_tag_id
+        local tag_label = tag.name or ""
+        if #tag_label > max_tag_label_len then
+          tag_label = tag_label:sub(1, max_tag_label_len)
+        end
+        if style.ButtonCentered(ctx, tag_label, "tag_btn_" .. tag.tag_id, -1, tag_btn_h, text_color) then
+          state.selected_tag_id = tag.tag_id
+          common.SetExtState("selected_tag_id", state.selected_tag_id)
+        end
+        reaper.ImGui_PopStyleColor(ctx, pop_colors)
+
+        if reaper.ImGui_BeginPopupContextItem(ctx) then
+          if reaper.ImGui_MenuItem(ctx, "Rename") then
+            state.rename_tag_id = tag.tag_id
+            state.rename_tag_text = tag.name
+            state.rename_tag_open = true
+          end
+          local allow_delete = tag.tag_id ~= default_tag_id
+          if reaper.ImGui_MenuItem(ctx, "Delete", nil, false, allow_delete) then
+            for pi = #pins, 1, -1 do
+              if pins[pi].tag_id == tag.tag_id then
+                pins[pi].tag_id = default_tag_id
+              end
+            end
+            table.remove(tags, i)
+            if state.selected_tag_id == tag.tag_id then
+              state.selected_tag_id = default_tag_id
+              common.SetExtState("selected_tag_id", state.selected_tag_id)
+            end
+            if state._set_dirty then
+              state._set_dirty(true)
             end
           end
-          table.remove(tags, i)
-          if state.selected_tag_id == tag.tag_id then
-            state.selected_tag_id = default_tag_id
-            common.SetExtState("selected_tag_id", state.selected_tag_id)
+          reaper.ImGui_EndPopup(ctx)
+        end
+      end
+      local pop_colors = style.PushButtonColors(ctx, style.Colors.tag_idle, style.Colors.tag_hover, style.Colors.tag_active)
+      if style.ButtonCentered(ctx, "+ Add Tag", "tag_add", -1, tag_btn_h, style.Colors.text) then
+        state.add_tag_open = true
+        state.add_tag_text = ""
+      end
+      reaper.ImGui_PopStyleColor(ctx, pop_colors)
+    end
+    if tag_started then
+      reaper.ImGui_EndChild(ctx)
+    end
+
+    reaper.ImGui_SetCursorPos(ctx, start_x + tag_w + spacing_x, start_y)
+
+    local avail = reaper.ImGui_GetContentRegionAvail(ctx)
+    local grid_visible, grid_started = style.BeginChild(ctx, "PinsGrid", avail, grid_h, true)
+    if grid_visible then
+      local filtered = {}
+      for _, pin in ipairs(pins) do
+        if pin.tag_id == state.selected_tag_id then
+          filtered[#filtered + 1] = pin
+        end
+      end
+
+      if #filtered == 0 then
+        reaper.ImGui_Text(ctx, "使用Pin脚本添加图钉吧！")
+      else
+        local btn_w = layout.pin_btn_w
+        local remove_pin_id = nil
+        for i, pin in ipairs(filtered) do
+          local is_selected = pin.pin_id == state.selected_pin_id
+          local text_color = is_selected and style.Colors.text_dark or style.Colors.text
+          local pop_colors
+          if is_selected then
+            pop_colors = style.PushButtonColors(ctx, style.Colors.teal, style.Colors.teal_hover, style.Colors.teal_active)
+          else
+            pop_colors = style.PushButtonColors(ctx, style.Colors.pin_idle, style.Colors.pin_hover, style.Colors.pin_active)
+          end
+          local pin_label = pin.pin_name or ""
+          if #pin_label > max_pin_label_len then
+            pin_label = pin_label:sub(1, max_pin_label_len)
+          end
+          if style.ButtonCentered(ctx, pin_label, "pin_btn_" .. pin.pin_id, btn_w, grid_btn_h, text_color) then
+            state.selected_pin_id = pin.pin_id
+            common.SetExtState("selected_pin_id", state.selected_pin_id)
+          end
+          local min_x, min_y = reaper.ImGui_GetItemRectMin(ctx)
+          local draw_list = reaper.ImGui_GetWindowDrawList(ctx)
+          local badge_r = 8
+          local pad = 6
+          local badge_x = min_x + pad + badge_r
+          local badge_y = min_y + pad + badge_r
+          local badge_color = is_selected and style.Colors.badge_active or style.Colors.badge_idle
+          reaper.ImGui_DrawList_AddCircleFilled(draw_list, badge_x, badge_y, badge_r, badge_color)
+          local badge_text = pin.pin_type == "TRACKS" and "T" or "I"
+          local pushed = style.PushFontBadge(ctx)
+          local text_w, text_h = reaper.ImGui_CalcTextSize(ctx, badge_text)
+          reaper.ImGui_DrawList_AddText(
+            draw_list,
+            badge_x - text_w * 0.5,
+            badge_y - text_h * 0.5,
+            style.Colors.text_white,
+            badge_text
+          )
+          if pushed then
+            style.PopFontBadge(ctx)
+          end
+          reaper.ImGui_PopStyleColor(ctx, pop_colors)
+          if reaper.ImGui_BeginPopupContextItem(ctx) then
+            if reaper.ImGui_MenuItem(ctx, "Rename") then
+              state.rename_pin_id = pin.pin_id
+              state.rename_text = pin.pin_name
+              state.rename_pin_open = true
+            end
+            if reaper.ImGui_MenuItem(ctx, "Move...") then
+              state.move_pin_id = pin.pin_id
+              state.move_pin_target_tag_id = pin.tag_id or ""
+              state.move_pin_new_tag = ""
+              state.move_pin_open = true
+            end
+            if reaper.ImGui_MenuItem(ctx, "Delete") then
+              remove_pin_id = pin.pin_id
+            end
+            reaper.ImGui_EndPopup(ctx)
+          end
+
+          if (i % cols) ~= 0 then
+            reaper.ImGui_SameLine(ctx)
+          end
+        end
+        if remove_pin_id then
+          for i = #pins, 1, -1 do
+            if pins[i].pin_id == remove_pin_id then
+              table.remove(pins, i)
+              break
+            end
+          end
+          if state.selected_pin_id == remove_pin_id then
+            state.selected_pin_id = ""
+            common.SetExtState("selected_pin_id", "")
           end
           if state._set_dirty then
             state._set_dirty(true)
           end
         end
-        reaper.ImGui_EndPopup(ctx)
       end
     end
-    local pop_colors = style.PushButtonColors(ctx, style.Colors.tag_idle, style.Colors.tag_hover, style.Colors.tag_active)
-    if style.ButtonCentered(ctx, "+ Add Tag", "tag_add", -1, tag_btn_h, style.Colors.text) then
-      state.add_tag_open = true
-      state.add_tag_text = ""
+    if grid_started then
+      reaper.ImGui_EndChild(ctx)
     end
-    reaper.ImGui_PopStyleColor(ctx, pop_colors)
+  end
+  if pins_area_started then
     reaper.ImGui_EndChild(ctx)
   end
-  reaper.ImGui_EndGroup(ctx)
-
-  reaper.ImGui_SameLine(ctx)
-
-  local avail = reaper.ImGui_GetContentRegionAvail(ctx)
-  local grid_ok = style.BeginChild(ctx, "PinsGrid", avail, grid_h, true)
-  if grid_ok then
-    local filtered = {}
-    for _, pin in ipairs(pins) do
-      if pin.tag_id == state.selected_tag_id then
-        filtered[#filtered + 1] = pin
-      end
-    end
-
-    if #filtered == 0 then
-      reaper.ImGui_Text(ctx, "使用Pin脚本添加图钉吧！")
-    else
-      local btn_w = layout.pin_btn_w
-      local remove_pin_id = nil
-      for i, pin in ipairs(filtered) do
-        local is_selected = pin.pin_id == state.selected_pin_id
-        local text_color = is_selected and style.Colors.text_dark or style.Colors.text
-        local pop_colors
-        if is_selected then
-          pop_colors = style.PushButtonColors(ctx, style.Colors.teal, style.Colors.teal_hover, style.Colors.teal_active)
-        else
-          pop_colors = style.PushButtonColors(ctx, style.Colors.pin_idle, style.Colors.pin_hover, style.Colors.pin_active)
-        end
-        local pin_label = pin.pin_name or ""
-        if #pin_label > max_pin_label_len then
-          pin_label = pin_label:sub(1, max_pin_label_len)
-        end
-        if style.ButtonCentered(ctx, pin_label, "pin_btn_" .. pin.pin_id, btn_w, grid_btn_h, text_color) then
-          state.selected_pin_id = pin.pin_id
-          common.SetExtState("selected_pin_id", state.selected_pin_id)
-        end
-        local min_x, min_y = reaper.ImGui_GetItemRectMin(ctx)
-        local draw_list = reaper.ImGui_GetWindowDrawList(ctx)
-        local badge_r = 8
-        local pad = 6
-        local badge_x = min_x + pad + badge_r
-        local badge_y = min_y + pad + badge_r
-        local badge_color = is_selected and style.Colors.badge_active or style.Colors.badge_idle
-        reaper.ImGui_DrawList_AddCircleFilled(draw_list, badge_x, badge_y, badge_r, badge_color)
-        local badge_text = pin.pin_type == "TRACKS" and "T" or "I"
-        local pushed = style.PushFontBadge(ctx)
-        local text_w, text_h = reaper.ImGui_CalcTextSize(ctx, badge_text)
-        reaper.ImGui_DrawList_AddText(
-          draw_list,
-          badge_x - text_w * 0.5,
-          badge_y - text_h * 0.5,
-          style.Colors.text_white,
-          badge_text
-        )
-        if pushed then
-          style.PopFontBadge(ctx)
-        end
-        reaper.ImGui_PopStyleColor(ctx, pop_colors)
-        if reaper.ImGui_BeginPopupContextItem(ctx) then
-          if reaper.ImGui_MenuItem(ctx, "Rename") then
-            state.rename_pin_id = pin.pin_id
-            state.rename_text = pin.pin_name
-            state.rename_pin_open = true
-          end
-          if reaper.ImGui_MenuItem(ctx, "Move...") then
-            state.move_pin_id = pin.pin_id
-            state.move_pin_target_tag_id = pin.tag_id or ""
-            state.move_pin_new_tag = ""
-            state.move_pin_open = true
-          end
-          if reaper.ImGui_MenuItem(ctx, "Delete") then
-            remove_pin_id = pin.pin_id
-          end
-          reaper.ImGui_EndPopup(ctx)
-        end
-
-        if (i % cols) ~= 0 then
-          reaper.ImGui_SameLine(ctx)
-        end
-      end
-      if remove_pin_id then
-        for i = #pins, 1, -1 do
-          if pins[i].pin_id == remove_pin_id then
-            table.remove(pins, i)
-            break
-          end
-        end
-        if state.selected_pin_id == remove_pin_id then
-          state.selected_pin_id = ""
-          common.SetExtState("selected_pin_id", "")
-        end
-        if state._set_dirty then
-          state._set_dirty(true)
-        end
-      end
-    end
-    reaper.ImGui_EndChild(ctx)
-  end
-  reaper.ImGui_EndChild(ctx)
 
   if state.add_tag_open then
     reaper.ImGui_OpenPopup(ctx, "Add Tag")
