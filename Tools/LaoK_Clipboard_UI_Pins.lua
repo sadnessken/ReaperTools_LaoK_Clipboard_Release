@@ -90,7 +90,6 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
   end
 
   if pins_area_visible then
-    local start_x, start_y = reaper.ImGui_GetCursorPos(ctx)
     local tag_visible, tag_started = style.BeginChild(ctx, "TagList", tag_w, tag_child_h, true)
     if tag_visible then
       for i, tag in ipairs(tags) do
@@ -148,10 +147,8 @@ function M.DrawPinsArea(ctx, common, state, style, layout)
       reaper.ImGui_EndChild(ctx)
     end
 
-    reaper.ImGui_SetCursorPos(ctx, start_x + tag_w + spacing_x, start_y)
-
-    local avail = reaper.ImGui_GetContentRegionAvail(ctx)
-    local grid_visible, grid_started = style.BeginChild(ctx, "PinsGrid", avail, grid_h, true)
+    reaper.ImGui_SameLine(ctx)
+    local grid_visible, grid_started = style.BeginChild(ctx, "PinsGrid", -1, grid_h, true)
     if grid_visible then
       local filtered = {}
       for _, pin in ipairs(pins) do
