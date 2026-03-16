@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="LaoK Clipboard" commit="6c6d55c9331d11ec35b076700ae10fab0c00ca87">
+<index version="1" name="LaoK Clipboard" commit="81ed8319f6d6943e7e1023a720932eb972fbe344">
   <category name="Tools">
     <reapack name="LaoK_Clipboard_Main.lua" type="script" desc="LaoK Clipboard (Main + Actions)">
       <metadata>
@@ -148,6 +148,22 @@
         <source file="LaoK_Clipboard_UserData.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/6c6d55c9331d11ec35b076700ae10fab0c00ca87/Tools/LaoK_Clipboard_UserData.lua</source>
         <source file="LaoK_Clipboard_Window.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/6c6d55c9331d11ec35b076700ae10fab0c00ca87/Tools/LaoK_Clipboard_Window.lua</source>
         <source file="LaoK_Clipboard_Reset_Window_Pos.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/6c6d55c9331d11ec35b076700ae10fab0c00ca87/Tools/LaoK_Clipboard_Reset_Window_Pos.lua</source>
+      </version>
+      <version name="0.1.4.3" author="sadnessken" time="2026-03-16T11:23:21Z">
+        <changelog><![CDATA[+ Initial release]]></changelog>
+        <source main="main">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_Main.lua</source>
+        <source main="main" file="LaoK_Clipboard_Action_Pin.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_Action_Pin.lua</source>
+        <source main="main" file="LaoK_Clipboard_Action_Paste.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_Action_Paste.lua</source>
+        <source main="main" file="LaoK_Clipboard_Toolbar_Toggle.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_Toolbar_Toggle.lua</source>
+        <source file="LaoK_Clipboard_Shared.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_Shared.lua</source>
+        <source file="LaoK_Clipboard_Indexer.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_Indexer.lua</source>
+        <source file="LaoK_Clipboard_State.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_State.lua</source>
+        <source file="LaoK_Clipboard_UI_Pins.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_UI_Pins.lua</source>
+        <source file="LaoK_Clipboard_UI_Search.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_UI_Search.lua</source>
+        <source file="LaoK_Clipboard_UI_Style.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_UI_Style.lua</source>
+        <source file="LaoK_Clipboard_UserData.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_UserData.lua</source>
+        <source file="LaoK_Clipboard_Window.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_Window.lua</source>
+        <source file="LaoK_Clipboard_Reset_Window_Pos.lua">https://github.com/sadnessken/ReaperTools_LaoK_Clipboard_Release/raw/81ed8319f6d6943e7e1023a720932eb972fbe344/Tools/LaoK_Clipboard_Reset_Window_Pos.lua</source>
       </version>
     </reapack>
   </category>
